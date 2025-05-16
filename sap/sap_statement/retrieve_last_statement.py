@@ -1,6 +1,9 @@
 import win32com.client
 import pywintypes
 from time import sleep
+import os
+import logging
+from logging.handlers import RotatingFileHandler
 
 
 # == Global Constants ===
@@ -62,6 +65,48 @@ def main():
 
     session.ActiveWindow.Close()
     input('Press Enter to exit . . .')
+
+
+# == Logging setup ===
+class UserFilter(logging.Filter):
+    def filter(self, record):
+        record.user = os.getlogin()
+        return True
+    
+    
+def setup_logging() -> logging.Logger:
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.DEBUG)
+    #Format: Date loggerLevel userID functionName: loggingMessage
+    FH_FORMAT = '%(asctime)s %(levelname)-8s %(user)-10s %(funcName)s:  %(message)s'
+    #Format: loggerLevel userID: loggingMessage
+    CH_FORMAT = '%(levelname)-8s %(user)-10s:  %(message)s'
+
+    # File handler
+    # Create a file handler and set level to DEBUG
+    log_path = os.path.join(os.path.dirname(__file__), 'sap_statement_retrieval.log')
+    file_handler = RotatingFileHandler(log_path, maxBytes=1_000_000, backupCount=5, encoding='utf-8')
+    file_handler.setLevel(logging.DEBUG)
+    # # Set formatter for file handler
+    file_handler.setFormatter(logging.Formatter(FH_FORMAT))
+
+    # Console handler
+    # Create a console handler and set level to INFO
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(logging.INFO)
+    # Set formatter for console handler
+    console_handler.setFormatter(logging.Formatter(CH_FORMAT))
+
+    # Add the console and file handler to the logger
+    if not logger.hasHandlers():
+        logger.addHandler(console_handler)
+        logger.addHandler(file_handler)
+
+    # Add the user filter to the logger
+    user_filter = UserFilter()
+    logger.addFilter(user_filter)
+
+    return logger
 
 
 # == Helper functions ===
