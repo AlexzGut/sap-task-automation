@@ -4,6 +4,7 @@ from time import sleep
 import os
 import logging
 from logging.handlers import RotatingFileHandler
+import sys
 
 
 # == Global Constants ===
@@ -17,18 +18,14 @@ def main():
     # Initialize logging
     logger = setup_logging()
 
-    logger.info('Opening new SAP Session . . .')
+    logger.info('Opening new SAP GUI Session . . .')
     connection = get_sap_connection()
     session = connection.Sessions(0)
-    session.findById("wnd[0]").sendVKey(74) # Open a new SAP window
+    logger.info('New SAP GUI Session opened')
 
-    # Click continue if Maximum number of SAP GUI sessions reached
-    accept_pop_up(session)
-    
-    logger.info('New SAP Session opened')
     logger.info('Connecting with new SAP GUI Session. . . .')
     session = get_last_sap_session(session, connection)
-    logger.info('Connected to SAP Session')
+    logger.info('Connected to SAP GUI Session')
 
     account_number = get_account_number()
     month = '0' + input('Enter the statement Month: ')
@@ -90,9 +87,15 @@ def setup_logging() -> logging.Logger:
     #Format: loggerLevel userID: loggingMessage
     CH_FORMAT = '%(levelname)-8s %(user)-10s:  %(message)s'
 
+    if getattr(sys, 'frozen', False):
+        # Running as PyInstaller bundle
+        log_dir = os.path.dirname(sys.executable)
+    else:
+        log_dir = os.path.dirname(os.path.abspath(__file__))
+
     # File handler
     # Create a file handler and set level to DEBUG
-    log_path = os.path.join(os.path.dirname(__file__), 'retrieve_last_statement.log')
+    log_path = os.path.join(log_dir, 'retrieve_last_statement.log')
     file_handler = RotatingFileHandler(log_path, maxBytes=1_000_000, backupCount=5, encoding='utf-8')
     file_handler.setLevel(logging.DEBUG)
     # # Set formatter for file handler
@@ -166,24 +169,24 @@ def get_last_sap_session(old_session, connection):
     create_sap_session(old_session)
     # Access the last session (new window)
     n_children = connection.Sessions.Count
-    logger.debug(f'Number of SAP sessions: {n_children}')
+    logger.debug(f'Number of SAP GUI sessions: {n_children}')
     while (n_children == 6): # Max number of sessions allowed are six.
-        logger.warning('Too many SAP sessions!')
+        logger.warning('Too many SAP GUI sessions!')
         input('Close a SAP window and press Enter to continue . . .')
         create_sap_session(old_session)
         n_children = connection.Sessions.Count
     
-    logger.debug('Waiting for SAP session to be available')
+    logger.debug('Waiting for SAP GUI session to be available')
     sleep(0.5)
     while(True):
         try:
             session = connection.Sessions(n_children)
             break
         except pywintypes.com_error:
-            logger.warning('SAP session not available')
+            logger.warning('SAP GUI session not available')
             print(n_children)
             sleep(0.5) #wait for half a second and try again
-    logger.debug(f'Connected to Last SAP session: {n_children}')
+    logger.debug(f'Connected to Last SAP GUI Session: {n_children}')
     return session
 
 
