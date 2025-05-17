@@ -151,7 +151,14 @@ def go_to_sap_access_screen(session) -> None:
 
 def get_sap_connection():
     """Returns the first SAP connection."""
-    SapGuiAuto  = win32com.client.GetObject("SAPGUI")
+    logger = logging.getLogger(__name__)
+    while (True):
+        try:
+            SapGuiAuto  = win32com.client.GetObject("SAPGUI")
+            break
+        except pywintypes.com_error:
+            logger.warning("SAP GUI is not running. Please start SAP GUI and try again.")
+            input('Press Enter to continue . . .') 
     application = SapGuiAuto.GetScriptingEngine
     return application.Connections(0)
 
