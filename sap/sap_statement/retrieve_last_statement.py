@@ -69,7 +69,6 @@ def main():
         logger.info('Statement not found')
 
     session.ActiveWindow.Close()
-    input('Press Enter to exit . . .')
 
 
 # == Logging setup ===
@@ -313,5 +312,12 @@ def statements_exists(session, month : str) -> bool:
 
 
 if __name__ == '__main__':
-    main()
+    while True:
+        try:
+            main()        
+            input('Press Enter to run again or Ctrl+C to exit . . .')
+        except KeyboardInterrupt:
+            print('\nExiting . . .')
+            break
+
 
