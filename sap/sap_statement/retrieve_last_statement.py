@@ -14,66 +14,75 @@ POP_UP_ID = "wnd[1]/tbar[0]/btn[0]"
 
 
 #== Main function ===
-def main():
-    #Initialize logging
-    logger = setup_logging()
+def main() -> None:
+    session = None
+    try:
+        #Initialize logging
+        logger = setup_logging()
 
-    logger.info('Opening new SAP GUI Session . . .')
-    connection = get_sap_connection()
-    session = connection.Sessions(0)
-    logger.info('New SAP GUI Session opened')
+        logger.info('Opening new SAP GUI Session . . .')
+        connection = get_sap_connection()
+        session = connection.Sessions(0)
+        logger.info('New SAP GUI Session opened')
 
-    logger.info('Connecting with new SAP GUI Session. . . .')
-    session = get_last_sap_session(session, connection)
-    logger.info('Connected to SAP GUI Session')
+        logger.info('Connecting with new SAP GUI Session. . . .')
+        session = get_last_sap_session(session, connection)
+        logger.info('Connected to SAP GUI Session')
 
-    account_number = get_account_number()
-    month = get_month()
+        account_number = get_account_number()
+        month = get_month()
 
-    access_tcode_fbl5n(session)
-    while(True):
-        try:
-            communication_method = get_communication_method(session, account_number)
-            break
-        except pywintypes.com_error:
-            logger.info('Customer NOT found - Incorrect account number')  
-            account_number = get_account_number()          
-    
-    go_to_sap_access_screen(session)
-
-    logger.info(f'Accessing {communication_method.strip()} directory . . .')
-    access_tcode_al11(session)
-    double_click(session, 'DIRNAME', '/interfaces')
-    double_click(session, 'NAME', 'FII30040')
-    double_click(session, 'NAME', 'archive')
-    double_click(session, 'NAME', 'medi')
-    double_click(session, 'NAME', 'others') if communication_method == 'E-Mail' else double_click(session, 'NAME', 'mail')
-
-    logger.info('Filtering statements by account number . . .')
-    filter_statements_by_account_number(session, account_number)
-    statement_exists = statements_exists(session, month)
-
-    if statement_exists:
-        logger.info('Statement found')
-        logger.info('Downloading statement . . .')
-        session.findById("wnd[0]").sendVKey(14) # Access file attributes (Shift + F2)
-        directory = session.findById(SAP_GRID_ID).GetCellValue(0, 'VALUE')
-        file_name = session.findById(SAP_GRID_ID).GetCellValue(1, 'VALUE')
-
+        access_tcode_fbl5n(session)
+        while(True):
+            try:
+                communication_method = get_communication_method(session, account_number)
+                break
+            except pywintypes.com_error:
+                logger.info('Customer NOT found - Incorrect account number')  
+                account_number = get_account_number()          
+        
         go_to_sap_access_screen(session)
 
-        download_statement_from_cg3y(session, directory, file_name)
-        logger.info(f'Statement downloaded - {file_name}')
-    else:
-        go_to_sap_access_screen(session)
-        logger.info('Statement not found')
+        logger.info(f'Accessing {communication_method.strip()} directory . . .')
+        access_tcode_al11(session)
+        double_click(session, 'DIRNAME', '/interfaces')
+        double_click(session, 'NAME', 'FII30040')
+        double_click(session, 'NAME', 'archive')
+        double_click(session, 'NAME', 'medi')
+        double_click(session, 'NAME', 'others') if communication_method == 'E-Mail' else double_click(session, 'NAME', 'mail')
 
-    session.ActiveWindow.Close()
+        logger.info('Filtering statements by account number . . .')
+        filter_statements_by_account_number(session, account_number)
+        statement_exists = statements_exists(session, month)
+
+        if statement_exists:
+            logger.info('Statement found')
+            logger.info('Downloading statement . . .')
+            session.findById("wnd[0]").sendVKey(14) # Access file attributes (Shift + F2)
+            directory = session.findById(SAP_GRID_ID).GetCellValue(0, 'VALUE')
+            file_name = session.findById(SAP_GRID_ID).GetCellValue(1, 'VALUE')
+
+            go_to_sap_access_screen(session)
+
+            download_statement_from_cg3y(session, directory, file_name)
+            logger.info(f'Statement downloaded - {file_name}')
+        else:
+            go_to_sap_access_screen(session)
+            logger.info('Statement not found')
+    finally:
+        # Close the SAP session
+        logger.info('Closing SAP GUI Session . . .')
+        if session is not None:
+            try:
+                session.ActiveWindow.Close()
+            except pywintypes.com_error:
+                logger.warning('Failed to close SAP session - SAP GUI session not available')
+                
 
 
 # == Logging setup ===
 class UserFilter(logging.Filter):
-    def filter(self, record):
+    def filter(self, record : logging.LogRecord) -> bool:
         record.user = os.getlogin()
         return True
     
@@ -120,7 +129,7 @@ def setup_logging() -> logging.Logger:
 
 
 # == Helper functions ===
-def accept_pop_up(session):
+def accept_pop_up(session) -> None:
     """Accepts the pop-up window if it appears."""
     logger = logging.getLogger(__name__)
     try:
@@ -162,7 +171,7 @@ def get_sap_connection():
     return application.Connections(0)
 
 
-def create_sap_session(session):
+def create_sap_session(session) -> None:
     """Creates a new SAP session."""
     session.findById("wnd[0]").sendVKey(74) # Open a new SAP window
 
@@ -229,7 +238,7 @@ def is_valid_month(month: str) -> bool:
     return 1 <= month_int <= 12
 
 
-def get_month():
+def get_month() -> str:
     """prompts the user for a valid month (1-12 or 01-12)."""
     logger = logging.getLogger(__name__)
     month = input('Enter the statement Month: ')
@@ -240,13 +249,13 @@ def get_month():
     return month if len(month) == 2 else month.zfill(2)
 
 
-def is_valid_account(account_number):
+def is_valid_account(account_number: str) -> bool:
     """Checks if the account number is a 10-digit string."""
     acct_number_length = 10
     return (len(account_number) == acct_number_length) and (account_number.isdigit())
 
 
-def get_account_number():
+def get_account_number() -> str:
     """Prompts the user for a valid 10-digit account number."""
     logger = logging.getLogger(__name__)
     account_number = input('Enter account number: ')
@@ -257,7 +266,7 @@ def get_account_number():
     return account_number
 
 
-def access_tcode_fbl5n(session):
+def access_tcode_fbl5n(session) -> None:
     """Accesses the T-Code FBL5N."""
     logger = logging.getLogger(__name__)
 
@@ -272,7 +281,7 @@ def access_tcode_fbl5n(session):
     session.findById("wnd[0]/usr/radX_AISEL").select()
 
 
-def access_tcode_al11(session):
+def access_tcode_al11(session) -> None:
     """Accesses the T-Code AL11."""
     logger = logging.getLogger(__name__)
 
@@ -337,5 +346,6 @@ if __name__ == '__main__':
             main()        
             input('Press Enter to run again or Ctrl+C to exit . . .')
         except KeyboardInterrupt:
+
             print('\nExiting . . .')
             break
