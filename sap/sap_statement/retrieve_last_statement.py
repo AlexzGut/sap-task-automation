@@ -15,7 +15,7 @@ POP_UP_ID = "wnd[1]/tbar[0]/btn[0]"
 
 #== Main function ===
 def main():
-    # Initialize logging
+    #Initialize logging
     logger = setup_logging()
 
     logger.info('Opening new SAP GUI Session . . .')
@@ -28,7 +28,7 @@ def main():
     logger.info('Connected to SAP GUI Session')
 
     account_number = get_account_number()
-    month = '0' + input('Enter the statement Month: ')
+    month = get_month()
 
     access_tcode_fbl5n(session)
     while(True):
@@ -161,12 +161,14 @@ def get_sap_connection():
     application = SapGuiAuto.GetScriptingEngine
     return application.Connections(0)
 
+
 def create_sap_session(session):
     """Creates a new SAP session."""
     session.findById("wnd[0]").sendVKey(74) # Open a new SAP window
 
     # Click continue if Maximum number of SAP GUI sessions reached
     accept_pop_up(session)
+
 
 def get_last_sap_session(old_session, connection):
     """Returns the last SAP session."""
@@ -190,7 +192,6 @@ def get_last_sap_session(old_session, connection):
             break
         except pywintypes.com_error:
             logger.warning('SAP GUI session not available')
-            print(n_children)
             sleep(0.5) #wait for half a second and try again
     logger.debug(f'Connected to Last SAP GUI Session: {n_children}')
     return session
@@ -220,7 +221,26 @@ def get_communication_method(session, account_number : str) -> str:
     return session.findById("wnd[0]/usr/subSUBTAB:SAPLATAB:0100/tabsTABSTRIP100/tabpTAB01/ssubSUBSC:SAPLATAB:0201/subAREA1:SAPMF02D:7111/subADDRESS:SAPLSZA1:0300/subCOUNTRY_SCREEN:SAPLSZA1:0301/cmbADDR1_DATA-DEFLT_COMM").text
 
 
-def is_account_valid(account_number):
+def is_valid_month(month: str) -> bool:
+    """Checks if the input string is a valid month (1-12 or 01-12)."""
+    if not month.isdigit():
+        return False
+    month_int = int(month)
+    return 1 <= month_int <= 12
+
+
+def get_month():
+    """prompts the user for a valid month (1-12 or 01-12)."""
+    logger = logging.getLogger(__name__)
+    month = input('Enter the statement Month: ')
+
+    while (not is_valid_month(month)):
+        logger.warning(f'Invalid month {month} - Must be between 1 and 12')
+        month = input('Enter the statement Month: ')
+    return month if len(month) == 2 else month.zfill(2)
+
+
+def is_valid_account(account_number):
     """Checks if the account number is a 10-digit string."""
     acct_number_length = 10
     return (len(account_number) == acct_number_length) and (account_number.isdigit())
@@ -231,8 +251,8 @@ def get_account_number():
     logger = logging.getLogger(__name__)
     account_number = input('Enter account number: ')
 
-    while (not is_account_valid(account_number)):
-        logger.warning('Invalid Account number - Must be 10 digits long')
+    while (not is_valid_account(account_number)):
+        logger.warning(f'Invalid Account number {account_number} - Must be 10 digits long')
         account_number = input('Enter account number: ')
     return account_number
 
@@ -319,5 +339,3 @@ if __name__ == '__main__':
         except KeyboardInterrupt:
             print('\nExiting . . .')
             break
-
-
