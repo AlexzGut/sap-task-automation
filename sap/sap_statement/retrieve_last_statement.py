@@ -76,8 +76,7 @@ def main() -> None:
             try:
                 session.ActiveWindow.Close()
             except pywintypes.com_error:
-                logger.warning('Failed to close SAP session - SAP GUI session not available')
-                
+                logger.warning('Failed to close SAP session - SAP GUI session not available')           
 
 
 # == Logging setup ===
@@ -292,6 +291,8 @@ def access_tcode_al11(session) -> None:
 
 def download_statement_from_cg3y(session, source_file : str, target_file : str) -> None:
     """Downloads the statement from the T-Code CG3Y."""
+    download_path = os.path.join('C:\\', 'Users', os.getlogin(), 'Downloads')
+    
     logger = logging.getLogger(__name__)
 
     logger.debug('Accessing T-Code CG3Y')
@@ -302,7 +303,7 @@ def download_statement_from_cg3y(session, source_file : str, target_file : str) 
     logger.debug(f'Setting parameters for CG3Y Source: {source_file} Target: {target_file}')
     # Set the parameters for the download
     session.findById("wnd[1]/usr/txtRCGFILETR-FTAPPL").text = source_file + '/' + target_file
-    session.findById("wnd[1]/usr/ctxtRCGFILETR-FTFRONT").text = target_file
+    session.findById("wnd[1]/usr/ctxtRCGFILETR-FTFRONT").text = os.path.join(download_path, target_file)
     session.findById("wnd[1]/usr/chkRCGFILETR-IEFOW").selected = True
 
     logger.debug('Downloading file')
