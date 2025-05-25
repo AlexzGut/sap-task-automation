@@ -1,53 +1,83 @@
 import pandas as pd
 import os
+import sys
+import openpyxl
+
+
+def get_files(folder_name : str) -> list[str]:
+    """ Get the files in the given folder name """
+    if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+        current_dir = os.path.dirname(sys.executable)
+    else:
+        current_dir = os.path.dirname(__file__)
+
+    path = os.path.join(current_dir, 'files', folder_name)
+    files = os.listdir(path)
+
+    return [os.path.join(path, file) for file in files] 
+
+
+def get_site_from_file(file_name : str):
+    """ Get the site from the file name """
+    return file_name.split('_')[-1].rstrip('.csv')
+
+
+def filter_accounts_by_exclusion(df: pd.DataFrame, exclusion_df: pd.DataFrame, key: str = 'AR Account') -> pd.DataFrame:
+    """ Return rows from df where the key column is NOT present in exclusion_df[key]."""
+    return df[~df[key].isin(exclusion_df[key])]
 
 
 def main():
-    # Get the current directory of the application
-    current_dir = os.path.dirname(__file__)
+    """ Main function to get the readmitted accounts """
+    new_inactive_accounts = get_files('new_inactive_accounts')
+    old_inactive_accounts = get_files('old_inactive_accounts')[0]
+    admitted_flag_accounts = get_files('admitted_flag_accounts')
 
-    # Get the path to the files directory
-    path = os.path.join(current_dir, 'files')
+    for i in range(len(new_inactive_accounts)):
+        site = get_site_from_file(new_inactive_accounts[i])
 
-    # Check if the path exists
-    if not os.path.exists(path):
-        print(f"Path does not exist: {path}")
-        return
-    
-    # Get the file containing admitted accounts
-    new_discharged_file = '1 Jan 2017 - 31 Dec 2025 Inactive Patient Listing Report_Toronto.csv'
-    new_discharged_accounts = os.path.join(path, 'new_inactive_accounts', new_discharged_file)
+        # Read the files
+        df_old = pd.read_excel(old_inactive_accounts, sheet_name=site)
+        df_new = pd.read_csv(new_inactive_accounts[i])
+        df_adflag = pd.read_csv(admitted_flag_accounts[i])
 
-    # Get the file containing inactive accounts
-    old_inactive_accounts_file = 'Updated_ALL INACTIVE Account List.xlsx'
-    old_inactive_accounts = os.path.join(path, 'old_inactive_accounts',old_inactive_accounts_file)
+         # Filter the dataframes to only include rows with a valid 'AR Account'
+        df_old_clean = df_old.dropna(subset=['AR Account'])
+        df_new.dropna(subset=['AR Account'], inplace = True)
+        df_adflag.dropna(subset=['AR Account'], inplace=True)
 
-    # Read the files
-    df_new_discharged = pd.read_csv(new_discharged_accounts)
-    df_old_inactive = pd.read_excel(old_inactive_accounts, sheet_name='Toronto')
+        # Filter out rows where in the old inactive accounts 'Column1' is 'Deceased' 
+        df_old_discharged_accounts  = df_old_clean[df_old_clean['Column1'] == 'Discharged']
 
-    # Filter the dataframes to only include rows with a valid 'AR Account'
-    df_new_discharged.dropna(subset=['AR Account'], inplace=True)
-    df_old_inactive_ar = df_old_inactive.dropna(subset=['AR Account'])
+        # Get the readmitted accounts
+        df_readmitted = filter_accounts_by_exclusion(df_old_discharged_accounts , df_new) # accounts that were discharged but are now active, however, some discharged/deceased accounts are in the readmitted list
+        # This step, uses the readmitted accounts, and a report of admitted accounts with the discharged/deceased flag on to remove those accounts from the readmitted list.
+        # This step is necessary because Kroll's report of Discharged/Deceased accounts is based on the Discharged/Deceased date.
+        df_readmitted = filter_accounts_by_exclusion(df_readmitted, df_adflag)
 
-    # Filter out rows where 'Column1' is 'Deceased' 
-    df_old_discharged = df_old_inactive_ar[df_old_inactive_ar['Column1'] == 'Discharged']
-    
-    # Keep accounts that are in the old inactive accounts but not in the new inactive accounts 
-    df_readmitted = df_old_discharged[~df_old_discharged['AR Account'].isin(df_new_discharged['AR Account'])]
-    
-    # Select the necessary columns
-    cols = ['Pharmacy #',
-            'AR Account']
+        # Select the necessary columns
+        cols = ['Pharmacy #',
+                'AR Account']
 
-    df_readmitted = df_readmitted.reindex(columns = cols)
-    df_readmitted.rename(columns={'Pharmacy #': 'Site'}, inplace=True)
-    df_readmitted.to_csv(os.path.join(path, 'readmitted_accounts.csv'), index=False)
+        df_readmitted = df_readmitted.reindex(columns = cols)
+        df_readmitted.rename(columns={'Pharmacy #': 'Site'}, inplace=True)
+        df_readmitted.to_csv(os.path.join(os.path.join(os.path.dirname(__file__), 'files'), f'readmitted_accounts_{site}.csv'), index=False)
 
-    # Remove readmitted accounts from the old inactive accounts
-    df_readmitted_rm = df_old_inactive[~df_old_inactive['AR Account'].isin(df_readmitted['AR Account'])]
-    df_readmitted_rm.to_csv(os.path.join(path, 'readmitted_accounts_removed.csv'), index=False)
+        # Remove readmitted accounts from the old inactive accounts
+        df_readmitted_rm = filter_accounts_by_exclusion(df_old, df_readmitted)
+        df_readmitted_rm.to_csv(os.path.join(os.path.join(os.path.dirname(__file__), 'files'), f'readmitted_accounts_removed_{site}.csv'), index=False)
+
+        # Save the readmitted accounts to an excel file
+        with pd.ExcelWriter(os.path.join(os.path.join(os.path.dirname(__file__), 'files'), 'readmitted.xlsx'), mode='a', engine='openpyxl', if_sheet_exists='replace') as writer:
+            df_readmitted.to_excel(writer, sheet_name=site, index=False)
 
 
 if '__main__' == __name__:
     main()
+
+
+
+
+# I need to pull a report for admitted accounts where the Discharged/Deceased flag is on
+# Then, do exactly the same cleaning for the old inactive accounts,
+# and then compare the two files to see which accounts are in the (admitted + flag) accounts but not in the new inactive accounts
