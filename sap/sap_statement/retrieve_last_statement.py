@@ -20,6 +20,9 @@ def main() -> None:
         #Initialize logging
         logger = setup_logging()
 
+        account_number = get_account_number()
+        month = get_month()        
+
         logger.info('Opening new SAP GUI Session . . .')
         connection = get_sap_connection()
         session = connection.Sessions(0)
@@ -28,9 +31,6 @@ def main() -> None:
         logger.info('Connecting with new SAP GUI Session. . . .')
         session = get_last_sap_session(session, connection)
         logger.info('Connected to SAP GUI Session')
-
-        account_number = get_account_number()
-        month = get_month()
 
         access_tcode_fbl5n(session)
         while(True):
