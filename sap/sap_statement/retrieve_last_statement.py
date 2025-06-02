@@ -5,6 +5,7 @@ import os
 import logging
 from logging.handlers import RotatingFileHandler
 import sys
+from model import InteractionModel, UserModel
 
 
 # == Global Constants ===
@@ -16,6 +17,7 @@ POP_UP_ID = "wnd[1]/tbar[0]/btn[0]"
 #== Main function ===
 def main() -> None:
     session = None
+    user = os.getlogin()
     try:
         #Initialize logging
         logger = setup_logging()
@@ -32,10 +34,12 @@ def main() -> None:
         session = get_last_sap_session(session, connection)
         logger.info('Connected to SAP GUI Session')
 
+        insert_new_user(user)
+
         access_tcode_fbl5n(session)
         while(True):
             try:
-                communication_method = get_communication_method(session, account_number)
+                communication_method = get_communication_method(session, account_number).strip()
                 break
             except pywintypes.com_error:
                 logger.info('Customer NOT found - Incorrect account number')  
@@ -43,17 +47,22 @@ def main() -> None:
         
         go_to_sap_access_screen(session)
 
-        logger.info(f'Accessing {communication_method.strip()} directory . . .')
+        logger.info(f'Accessing {communication_method} directory . . .')
         access_tcode_al11(session)
         double_click(session, 'DIRNAME', '/interfaces')
         double_click(session, 'NAME', 'FII30040')
         double_click(session, 'NAME', 'archive')
         double_click(session, 'NAME', 'medi')
-        double_click(session, 'NAME', 'others') if communication_method == 'E-Mail' else double_click(session, 'NAME', 'mail')
+
+        if communication_method == 'E-Mail':
+            double_click(session, 'NAME', 'others') 
+        else:
+            double_click(session, 'NAME', 'mail')
 
         logger.info('Filtering statements by account number . . .')
         filter_statements_by_account_number(session, account_number)
         statement_exists = statements_exists(session, month)
+        status = 'Successful' if statement_exists else 'Not Found'
 
         if statement_exists:
             logger.info('Statement found')
@@ -72,6 +81,7 @@ def main() -> None:
     finally:
         # Close the SAP session
         logger.info('Closing SAP GUI Session . . .')
+        insert_new_interaction(user, account_number, month, status)
         if session is not None:
             try:
                 session.ActiveWindow.Close()
@@ -339,6 +349,18 @@ def statements_exists(session, month : str) -> bool:
             return True
     logger.debug(f'Statement not found')
     return False
+
+
+# === Database Helpeer Function ===
+def insert_new_user(user: str) -> None:
+    user_model = UserModel()
+    if user_model.find_by_id(user) is None:
+        user_model.insert(user)
+
+def insert_new_interaction(user, account_number, statement_month, status) -> None:
+    interaction = InteractionModel()
+    interaction.insert(user, account_number, statement_month, status)
+        
 
 
 if __name__ == '__main__':
