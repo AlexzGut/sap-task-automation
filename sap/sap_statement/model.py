@@ -10,6 +10,7 @@ class InteractionModel:
     def get_connection(self):
         conn = sqlite3.connect('statement_retrieval.db')
         conn.execute('PRAGMA journal_mode=WAL;')
+        conn.execute('PRAGMA foreign_keys = ON;')
         return conn
         
 
@@ -64,6 +65,7 @@ class InteractionModel:
                     statement = 'INSERT INTO interaction (user, account_number, statement_month, status) VALUES (?, ?, ?, ?)'
                     cursor.execute(statement, (user, account_number, statement_month, status))
                     conn.commit()
+                    conn.execute('PRAGMA wal_checkpoint(FULL);')
                 break
             except sqlite3.OperationalError as e:
                 if 'locked' in str(e):
@@ -80,6 +82,7 @@ class UserModel:
     def get_connection(self):
         conn = sqlite3.connect('statement_retrieval.db')
         conn.execute('PRAGMA journal_mode=WAL;')
+        conn.execute('PRAGMA foreign_keys = ON;')
         return conn
 
     def find_by_id(self, id : str):
@@ -119,6 +122,7 @@ class UserModel:
                     statement = 'INSERT INTO user (user) VALUES (?)'
                     cursor.execute(statement, (user,))
                     conn.commit()
+                    conn.execute('PRAGMA wal_checkpoint(FULL);')
                 break
             except sqlite3.OperationalError as e:
                 if 'locked' in str(e):

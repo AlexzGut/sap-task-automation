@@ -18,9 +18,13 @@ POP_UP_ID = "wnd[1]/tbar[0]/btn[0]"
 def main() -> None:
     session = None
     user = os.getlogin()
+    account_number = '0000000000'
+    month = '00'
+    status = 'Aborted'
     try:
         #Initialize logging
         logger = setup_logging()
+        insert_new_user(user)
 
         account_number = get_account_number()
         month = get_month()        
@@ -33,8 +37,6 @@ def main() -> None:
         logger.info('Connecting with new SAP GUI Session. . . .')
         session = get_last_sap_session(session, connection)
         logger.info('Connected to SAP GUI Session')
-
-        insert_new_user(user)
 
         access_tcode_fbl5n(session)
         while(True):
@@ -230,6 +232,7 @@ def get_communication_method(session, account_number : str) -> str:
         try:
             #Try to open XD03 tab
             session.findById("wnd[0]/tbar[1]/btn[34]").press()
+            accept_pop_up(session) # Handles popup when customer's changes have not been confirmed
             logger.debug('T-Code XD03 Accessed')
             break
         except pywintypes.com_error:
@@ -369,6 +372,5 @@ if __name__ == '__main__':
             main()        
             input('Press Enter to run again or Ctrl+C to exit . . .')
         except KeyboardInterrupt:
-
             print('\nExiting . . .')
             break
