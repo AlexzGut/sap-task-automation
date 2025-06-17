@@ -6,7 +6,7 @@ import openpyxl
 dirname = os.path.dirname(__file__)
 path = os.path.join(dirname, 'files')
 
-print(f'Reading files in folder . . .')
+print(f'Reading files in folder: {path} . . . ', end='')
 files = os.listdir(path)
 csv_files = []
 for file in files:
@@ -15,7 +15,7 @@ for file in files:
     else:
         excel_file = file
 excel_file_path = os.path.join(path, excel_file)
-print(f'Reading files in folder completed')
+print('Completed')
 
 print('Cleaning process started')
 openpyxl.Workbook().save(os.path.join(path, 'clean_data.xlsx')) # Creates a new excel
@@ -23,16 +23,26 @@ openpyxl.Workbook().save(os.path.join(path, 'clean_data.xlsx')) # Creates a new 
 for i in range(0, len(csv_files)):
     csv_file_path = os.path.join(path, csv_files[i])
     site = csv_files[i].split('_')[1].rstrip('.csv')
-    print(f'Cleaning Data: {site} . . .')
+    print(f'\tCleaning Data: {site} . . . ')
 
     try:
         df = pd.read_csv(csv_file_path) #data frame
     except (UnicodeDecodeError):
         df = pd.read_csv(csv_file_path, encoding='unicode_escape') #data frame
 
-    # Converts data in column 'Deceased Date' and 'Discharge Date' to type datetime64[ns]
-    df['Deceased Date'] = pd.to_datetime(df['Deceased Date'])
-    df['Discharge Date'] = pd.to_datetime(df['Discharge Date'])
+    site_codes = {'Mississauga':6012,'Richmond':6070,'Manitoba':6090}
+
+    if (site in ['Mississauga', 'Richmond', 'Manitoba']):
+        df['Pharmacy #'] = site_codes[site]
+
+    # Converts data in column 'Deceased Date' and 'Discharge Date' from type object to type datetime64[ns]
+    # Clean whitespace and invisible characters
+    df['Deceased Date'] = df['Deceased Date'].astype(str).str.strip().str.replace('\u00A0', '', regex=True)
+    df['Discharge Date'] = df['Discharge Date'].astype(str).str.strip().str.replace('\u00A0', '', regex=True)
+
+    # Convert to datetime
+    df['Deceased Date'] = pd.to_datetime(df['Deceased Date'], dayfirst=True, format='mixed', errors='coerce')
+    df['Discharge Date'] = pd.to_datetime(df['Discharge Date'], dayfirst=True, format='mixed', errors='coerce')
 
     # Creates a new column
     # 'Deceased' if the row 'Deceased Date' has a date, otherwise 'Discharge'
@@ -68,7 +78,5 @@ for i in range(0, len(csv_files)):
     book.save()
     book.close()
 
-    print(f'\t{site} Completed')
+    print(f'\tCompleted')
 print('Cleaning Process completed')
-
-
