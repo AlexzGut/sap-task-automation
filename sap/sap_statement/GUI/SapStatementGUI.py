@@ -1,7 +1,7 @@
 import sys, os
-from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QMainWindow, QLineEdit, QLabel, QPushButton, QRadioButton, QButtonGroup
+from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QMainWindow, QLineEdit, QLabel, QPushButton, QRadioButton, QButtonGroup, QCheckBox
 from PyQt6.QtGui import QIcon, QRegularExpressionValidator
-from PyQt6.QtCore import QRegularExpression
+from PyQt6.QtCore import QRegularExpression, Qt
 import SapStatement
 
 
@@ -20,11 +20,12 @@ class SapStatementRetrieval(QMainWindow):
         super().__init__()
         self.setWindowTitle('Retrieve SAP Statement')
         self.setWindowIcon(QIcon(os.path.join(basedir, 'icons', 'loblaw.ico')))
-        self.setFixedSize(300, 200) # width, height
+        self.setFixedSize(300, 300) # width, height
 
         # === Widgets ===
         # Text input
         self.le_account_number = QLineEdit()
+        self.le_account_number.setFixedHeight(40)
         self.le_account_number.setPlaceholderText('Account Number')
         self.le_account_number.textChanged.connect(self.hide_label)
         # Because there is a inputMask() set on the line edit, the returnPressed() signal will only be emitted
@@ -32,7 +33,8 @@ class SapStatementRetrieval(QMainWindow):
         self.le_account_number.returnPressed.connect(self.retrieve_statement) 
 
         self.le_month = QLineEdit()
-        self.le_month.setPlaceholderText('Month')
+        self.le_month.setFixedHeight(40)
+        self.le_month.setPlaceholderText('Month (MM)')
         self.le_month.textChanged.connect(self.hide_label)
         self.le_month.returnPressed.connect(self.retrieve_statement)
 
@@ -44,6 +46,7 @@ class SapStatementRetrieval(QMainWindow):
 
         # Radio Buttons
         self.rb_sdm = QRadioButton('SDM')
+        self.rb_sdm.setFixedHeight(40)
         self.rb_medisystem = QRadioButton('MediSystem')
         self.rb_medisystem.setChecked(True)
         # Radio Button Group (One selected at a time)
@@ -53,37 +56,63 @@ class SapStatementRetrieval(QMainWindow):
 
         # Button
         button = QPushButton('Submit', clicked=self.retrieve_statement)
+        button.setFixedHeight(40)
 
         # Label for messages
         self.lb_message = QLabel()
         self.lb_message.hide()
+        self.lb_message.setFixedHeight(30)
         self.lb_message.setStyleSheet('''
-            color: #ED4337
+            color: red;
         ''')
 
+        # === Send Email Option ===
+        # Check Box
+        self.check_box = QCheckBox('Send Email')
+        self.check_box .setFixedHeight(40)
+        self.check_box.setCheckState(Qt.CheckState.Unchecked)
+        # Check Box signals
+        self.check_box.stateChanged.connect(self.state_changed)
+
+        # Line Edit (Customer email)
+        self.le_cx_email = QLineEdit()
+        self.le_cx_email .setFixedHeight(40)
+        self.le_cx_email.setPlaceholderText('email@address.com')
+        rx_email = QRegularExpression('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$')
+        self.le_cx_email.setValidator(QRegularExpressionValidator(rx_email, self))
+        self.le_cx_email.hide()
+        self.le_cx_email.textChanged.connect(self.hide_label)
+
+        # === Layouts ===
         # Create Vertical layout and add Widgets to the layout
-        verticalLayout = QVBoxLayout()
-        verticalLayout.addWidget(self.le_account_number)
-        verticalLayout.addWidget(self.le_month)
-        verticalLayout.addWidget(self.lb_message)
+        vertical_layout = QVBoxLayout()
+        vertical_layout.addWidget(self.le_account_number)
+        vertical_layout.addWidget(self.le_month)
+        vertical_layout.addWidget(self.lb_message)
 
         # Create Horizontal layout for radio buttons
-        horizontalLayout = QHBoxLayout()
-        horizontalLayout.addWidget(self.rb_sdm)
-        horizontalLayout.addWidget(self.rb_medisystem)
+        horizontal_layout = QHBoxLayout()
+        # horizontalLayout.addWidget(self.rb_sdm)
+        horizontal_layout.addWidget(self.rb_medisystem)
+
+        email_layout = QVBoxLayout()
+        email_layout.addWidget(self.check_box)
+        email_layout.addWidget(self.le_cx_email)
+
         # Add Horizontal layout to Vertical layout
-        verticalLayout.addLayout(horizontalLayout)
+        vertical_layout.addLayout(horizontal_layout)
+        vertical_layout.addLayout(email_layout)
 
         # Add button
-        verticalLayout.addWidget(button)
+        vertical_layout.addWidget(button)
 
         # Create a dummy QWidget to set the layout and add to the MainWindow 
         container = QWidget()
-        container.setLayout(verticalLayout)
+        container.setLayout(vertical_layout)
         self.setCentralWidget(container)
 
     def retrieve_statement(self):
-        if self.validate_required_field() and self.valid_month():
+        if self.validate_account_number() and self.validate_month() and self.validate_email():
             # Set retrieve_las
             month = self.parse_month()
             if self.rb_sdm.isChecked():
@@ -95,28 +124,48 @@ class SapStatementRetrieval(QMainWindow):
             
             self.le_account_number.clear()
             self.le_month.clear()
+            self.le_cx_email.clear()
+            self.check_box.setCheckState(Qt.CheckState.Unchecked)
 
     # Field validations
-    def validate_required_field(self):
-        if self.le_account_number.text() == '':
-            self.lb_message.show()
-            self.lb_message.setText('Missing Account number')
-            self.le_account_number.setFocus()
-            return False
-
-        if self.le_month.text() == '':
+    def validate_month(self):
+        if not self.le_month.text():
             self.lb_message.show()
             self.lb_message.setText('Missing Month')
             self.le_month.setFocus()
             return False
+    
         return True
-
-    def valid_month(self):
-        if self.le_month.text() == '0':
+    
+    def validate_account_number(self):
+        if not self.le_account_number.text():
             self.lb_message.show()
-            self.lb_message.setText('Month must be 01 - 12')
-            self.le_month.setFocus()
+            self.lb_message.setText('Missing Account number')
+            self.le_account_number.setFocus()
             return False
+        
+        if len(self.le_account_number.text()) < 10:
+            self.lb_message.show()
+            self.lb_message.setText('Account number must be 10 digits long')
+            self.le_account_number.setFocus()
+            return False
+        
+        return True
+    
+    def validate_email(self):
+        if self.check_box.checkState() == Qt.CheckState.Checked:
+            if not self.le_cx_email.text():
+                self.lb_message.show()
+                self.lb_message.setText('Missing Email Address')
+                self.le_cx_email.setFocus()
+                return False
+
+            if not self.le_cx_email.hasAcceptableInput():
+                self.lb_message.show()
+                self.lb_message.setText('Invalid email address')
+                self.le_cx_email.setFocus()
+                return False
+            
         return True
 
     def parse_month(self) -> str:
@@ -126,19 +175,18 @@ class SapStatementRetrieval(QMainWindow):
     
     def hide_label(self):
         self.lb_message.hide()
+
+    def state_changed(self, state):
+        if Qt.CheckState(state) == Qt.CheckState.Checked:
+            self.le_cx_email.show()
+        else:
+            self.le_cx_email.hide()
+        self.hide_label()
       
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    app.setStyleSheet('''
-        Qwidget {
-            font-size: 25px;                  
-        }
-                      
-        QLineEdit, QPushButton{
-            height: 30px;
-        }
-    ''')
+
     mainWindow = SapStatementRetrieval()
     mainWindow.show()
 

@@ -17,7 +17,8 @@ POP_UP_ID = "wnd[1]/tbar[0]/btn[0]"
 #== Main function ===
 def execute(window : QMainWindow, account_number : str, month : str, company : str) -> None:
     session = None
-
+    message = ''
+    account_found = True
     try:
         #Initialize logging
         logger = setup_logging()     
@@ -45,6 +46,7 @@ def execute(window : QMainWindow, account_number : str, month : str, company : s
                 QMessageBox.information(window,
                                     'Customer Not Found',
                                     'Confirm the SAP account number is valid and try again')
+                account_found = False
                 return       
         
         go_to_sap_access_screen(session)
@@ -81,16 +83,18 @@ def execute(window : QMainWindow, account_number : str, month : str, company : s
             logger.info('Statement not found')
 
         message = 'Success Retrieval' if statement_exists else 'Failure Retrieval'
-        QMessageBox.information(window,
-                        'Statement retrieval', 
-                        message)
+
     finally:
         # Close the SAP session
         logger.info('Closing SAP GUI Session . . .')
         if session is not None:
             try:
                 session.ActiveWindow.Close()
-            except pywintypes.com_error:
+                if account_found:
+                    QMessageBox.information(window,
+                                'Statement retrieval', 
+                                message)
+            except (pywintypes.com_error, Exception):
                 logger.warning('Failed to close SAP session - SAP GUI session not available')           
 
 
