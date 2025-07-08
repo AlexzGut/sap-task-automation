@@ -6,6 +6,7 @@ import logging
 from logging.handlers import RotatingFileHandler
 import sys
 from PyQt6.QtWidgets import QMessageBox, QMainWindow
+import typing
 
 
 # == Global Constants ===
@@ -15,10 +16,11 @@ POP_UP_ID = "wnd[1]/tbar[0]/btn[0]"
 
 
 #== Main function ===
-def execute(window : QMainWindow, account_number : str, month : str, company : str) -> None:
+def execute(window : QMainWindow, account_number : str, month : str, company : str) -> typing.Dict:
     session = None
     message = ''
     account_found = True
+    context = {}
     try:
         #Initialize logging
         logger = setup_logging()     
@@ -26,14 +28,14 @@ def execute(window : QMainWindow, account_number : str, month : str, company : s
         logger.debug('Opening new SAP GUI Session . . .')
         connection = get_sap_connection(window)
         if connection == None:
-            return
+            return context
         session = connection.Sessions(0)
         logger.debug('New SAP GUI Session opened')
 
         logger.debug('Connecting with new SAP GUI Session. . . .')
         session = get_last_sap_session(window, session, connection)
         if session == None: 
-            return
+            return context
         logger.debug('Connected to SAP GUI Session')
 
         access_tcode_fbl5n(session)
@@ -47,7 +49,7 @@ def execute(window : QMainWindow, account_number : str, month : str, company : s
                                     'Customer Not Found',
                                     'Confirm the SAP account number is valid and try again')
                 account_found = False
-                return       
+                return context       
         
         go_to_sap_access_screen(session)
 
@@ -73,6 +75,7 @@ def execute(window : QMainWindow, account_number : str, month : str, company : s
             session.findById("wnd[0]").sendVKey(14) # Access file attributes (Shift + F2)
             directory = session.findById(SAP_GRID_ID).GetCellValue(0, 'VALUE')
             file_name = session.findById(SAP_GRID_ID).GetCellValue(1, 'VALUE')
+            context['file_name'] = file_name
 
             go_to_sap_access_screen(session)
 
@@ -82,7 +85,7 @@ def execute(window : QMainWindow, account_number : str, month : str, company : s
             go_to_sap_access_screen(session)
             logger.info('Statement not found')
 
-        message = 'Success Retrieval' if statement_exists else 'Failure Retrieval'
+        message = 'Statement retrieved successfully' if statement_exists else 'No statement found for the selected criteria'
 
     finally:
         # Close the SAP session
@@ -95,7 +98,8 @@ def execute(window : QMainWindow, account_number : str, month : str, company : s
                                 'Statement retrieval', 
                                 message)
             except (pywintypes.com_error, Exception):
-                logger.warning('Failed to close SAP session - SAP GUI session not available')           
+                logger.warning('Failed to close SAP session - SAP GUI session not available')    
+    return context       
 
 
 # == Logging setup ===
