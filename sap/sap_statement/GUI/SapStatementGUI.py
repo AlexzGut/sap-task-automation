@@ -1,8 +1,10 @@
 import sys, os
-from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QMainWindow, QLineEdit, QLabel, QPushButton, QRadioButton, QButtonGroup, QCheckBox
+from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QMainWindow, QLineEdit, QLabel, QPushButton, QRadioButton, QButtonGroup, QCheckBox, QMessageBox
 from PyQt6.QtGui import QIcon, QRegularExpressionValidator
 from PyQt6.QtCore import QRegularExpression, Qt
 import SapStatement
+import EmailSender
+import calendar
 
 
 basedir = os.path.dirname(__file__)
@@ -120,8 +122,27 @@ class SapStatementRetrieval(QMainWindow):
             if self.rb_medisystem.isChecked():
                 company = 'medi'
 
-            SapStatement.execute(self, self.le_account_number.text(), month, company)
-            
+            context = SapStatement.execute(self, self.le_account_number.text(), month, company)
+
+            if self.check_box.checkState() == Qt.CheckState.Checked:
+                if context.get('file_name'):
+                    download_path = os.path.join('C:\\', 'Users', os.getlogin(), 'Downloads')
+                    month_name = calendar.month_name[int(self.le_month.text())]                    
+                    template_values = {'account_field' : f'<b>{self.le_account_number.text()}</b>',
+		                               'month_field' : f'<b>{month_name}</b>'}
+                    
+                    email = EmailSender.EmailSender()
+                    email.setup_template(os.path.join(basedir, 'email_templates', 'monthly_statement_template.msg'))
+                    email.set_recipients(self.le_cx_email.text())
+                    email.set_subject(f'{month_name} Statement')
+                    email.set_attachments(os.path.join(download_path, context.get('file_name')))
+                    email.update_body(template_values)
+                    email.send_email()
+
+                    QMessageBox.information(self,
+                                    'Email Sent',
+                                    f'Email to {self.le_cx_email.text()} was sent successfully')
+
             self.le_account_number.clear()
             self.le_month.clear()
             self.le_cx_email.clear()
@@ -181,6 +202,7 @@ class SapStatementRetrieval(QMainWindow):
             self.le_cx_email.show()
         else:
             self.le_cx_email.hide()
+            self.le_cx_email.clear()
         self.hide_label()
       
 
