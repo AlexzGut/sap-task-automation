@@ -23,11 +23,13 @@ This guide explains how to create a standalone Windows executable (`.exe`) for t
 
 2. **Run PyInstaller** with the following command:
    ```
-   pyinstaller -w --icon="icons\loblaw.ico" --add-data="icons;icons" --name "SAP Statement" SapStatementGUI.py
+   pyinstaller -w --icon="icons\loblaw.ico" --add-data="icons;icons" --add-data="email_templates;email_templates" --name "SAP Statement" SapStatementGUI.py
    ```
    - `-w` : No console window --windows and --noconsole can be used too (for GUI apps)
    - `--icon="icons\loblaw.ico"` : Sets the application icon
-   - `--add-data="icons;icons"` : Includes the `icons` folder in the build (use `;` as separator on Windows)
+   - `--add-data="icons;icons"` : Includes the `icons` folder in the build
+   - `--add-data="email_templates;email_templates"` : Includes the `email templates` folder in the build
+      - (use `;` as separator on Windows, --add-data flag can be added multiple times)
    - `--name "SAP Statement"` : Sets the output executable name
    - `SapStatementGUI.py` : Your main Python script
 
