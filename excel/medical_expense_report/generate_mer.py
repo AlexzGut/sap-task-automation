@@ -1,38 +1,92 @@
 import pandas as pd
-import matplotlib.pyplot as plt
-from matplotlib.backends.backend_pdf import PdfPages
+import pdfkit
+import os
+import random
+from datetime import datetime, timedelta
 
 
 def generate_medical_expense_report(file_path : str, customer_name : str):
-    df = clean_data_pipeline(file_path, customer_name)
+    basedir = os.path.dirname(__file__)
+    
+    # df = clean_data_pipeline(file_path, customer_name)
+
+    # =================== Testing ===========================
+    # Random name generators
+    first_names = ['John', 'Jane', 'Alice', 'Robert', 'Emily', 'Michael', 'Laura', 'David', 'Sarah', 'Chris']
+    last_names = ['Smith', 'Johnson', 'Brown', 'Taylor', 'Anderson', 'Lee', 'White', 'Martin', 'Clark', 'Lewis']
+
+    # Generate 50 rows of sample data
+    n = 50
+    df = pd.DataFrame({
+        'RX #': [f"RX{1000+i}" for i in range(n)],
+        'Transaction #': [f"T{5000+i}" for i in range(n)],
+        'RX Date': [datetime.today() - timedelta(days=random.randint(0, 365)) for _ in range(n)],
+        'Quantiry': [random.randint(10, 100) for _ in range(n)],
+        'Drug # Din': [f"DIN{random.randint(100000, 999999)}" for _ in range(n)],
+        'Doctor First Name': [random.choice(first_names) for _ in range(n)],
+        'Doctor Last Name': [random.choice(last_names) for _ in range(n)],
+        'Total Price': [round(random.uniform(10.0, 300.0), 2) for _ in range(n)],
+        'Total Fee': [round(random.uniform(5.0, 50.0), 2) for _ in range(n)],
+        'Total Plan Paid': [round(random.uniform(0.0, 200.0), 2) for _ in range(n)],
+        'Total 3rd Party Pays': [round(random.uniform(0.0, 100.0), 2) for _ in range(n)],
+        'Patient Pays': [round(random.uniform(0.0, 100.0), 2) for _ in range(n)],
+        'Adjudication Date': [datetime.today() - timedelta(days=random.randint(0, 365)) for _ in range(n)],
+    })
+
+    #==================================================================
 
     pdf_filename = f'Medical Expense Report {customer_name}.pdf'
-    with PdfPages(pdf_filename) as pdf:
+   
+    # Load HTML template
+    with open(os.path.join(basedir, 'resources', 'html_template','medical_expense_report.html'), 'r') as file:
+        html_template = file.read()
 
-        # Add DataFrame as a table
-        rows_per_page = 20  # Set how many rows per pages
-        num_pages = (len(df) + rows_per_page - 1) // rows_per_page
+    # Convert DataFrame to HTML table
+    # Extract column headers separately
+    header_html = '<tr>' + ''.join(f'<th><span>{col}</span></th>' for col in df.columns) + '</tr>'
 
-        for page in range(num_pages):
-            start = page * rows_per_page
-            end = min(start + rows_per_page, len(df))
-            df_chunk = df.iloc[start:end]
+    #Extract data without headers from dataframe
+    html_rows = df.to_html(index=False, header=False)
 
-            fig_table, ax_table = plt.subplots(figsize=(11.69, 8.27))  # Adjust height for rows
-            ax_table.axis('tight')
-            ax_table.axis('off')
-            col_widths = [0.09] * df.shape[1] # Adjust as needed
+    # Insert headers manually into a table
+    mer_html = f'''
+    <table class="dataframe">
+    <thead>
+    {header_html}
+    </thead>
+    {''.join(html_rows.splitlines()[1:-1])}
+    </table>
+    '''
 
-            table = ax_table.table(
-                cellText=df_chunk.values,
-                colLabels=df.columns,
-                loc='center',
-                colWidths=col_widths
-            )
-            pdf.savefig(fig_table)
-            plt.close(fig_table) # Close the figure to free memory
+    # Replace <data> tag with table HTML
+    updated_html = html_template.replace('<data>', mer_html)
+
+    # Replace <img alt="medisystem_logo"> tag with MediSystem Logo
+    medi_logo_tag = f'<img src="{os.path.join(basedir, 'resources', 'img', 'mediSystem_logo.png')}" alt="mediSystem_logo">'
+    updated_html = updated_html.replace('<img alt="medisystem_logo">', medi_logo_tag)
+
+    # Save updated HTML
+    # with open(os.path.join(basedir, 'temp.html'), 'w') as file:
+    #     file.write(updated_html)
+
+    path_wkhtmltopdf = os.path.join(basedir, 'resources', 'wkhtmltopdf', 'wkhtmltopdf.exe')  # Adjust for your system
+    config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
+    options = {
+        'page-size': 'A4',
+        'orientation': 'landscape',
+        'encoding' : 'utf-8',
+        'enable-local-file-access': None,
+        'margin-top': '0.5in',
+        'margin-right': '0.2in',
+        'margin-bottom': '1.0in',
+        'margin-left': '0.2in',
+    }
+
+    pdfkit.from_string(updated_html, pdf_filename, configuration=config, options=options)
+    print('Completed')
 
 
+generate_medical_expense_report('', 'John')
 # === Pipeline classes ===
 class PipelineStage:
     def __init__(self, func):
