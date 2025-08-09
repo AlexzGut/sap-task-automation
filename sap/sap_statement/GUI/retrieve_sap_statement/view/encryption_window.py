@@ -1,0 +1,127 @@
+import os
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QListWidget, QListWidgetItem, QLabel, QLineEdit, QPushButton, QMessageBox, QFileDialog#, QProgressDialog
+from PyQt6.QtGui import QIcon
+from PyQt6.QtCore import Qt
+from time import sleep
+from pypdf import PdfReader, PdfWriter, errors
+
+
+basedir = os.path.dirname(__file__)
+
+class Encryption(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        # === Widgets ===
+        # Buttons
+        self.btn_select_folder = QPushButton('\U0001F4C2 Select Files . . .')
+        self.btn_select_folder.setFixedHeight(40)
+
+        self.btn_submit= QPushButton('Submit')
+        self.btn_submit.setFixedHeight(40)
+        self.btn_submit.setEnabled(False)
+
+        # Labels
+        self.lb_files = QLabel()
+        self.lb_files.setText('No files selected')
+
+        # List
+        self.li_files = QListWidget()
+        self.li_files.setSelectionMode(QListWidget.SelectionMode.ExtendedSelection)
+
+        # Text
+        self.le_password = QLineEdit()
+        self.le_password.setPlaceholderText('Encryption Password')
+        self.le_password.setFixedHeight(40)
+
+        # === Signals ===
+        self.btn_select_folder.clicked.connect(self.handle_btn_select_folder)
+        self.btn_submit.clicked.connect(self.handle_btn_submit)
+
+        # === Create and add widgets to Vertical layout ===
+        main_layout = QVBoxLayout()
+        main_layout.addWidget(self.lb_files)
+        main_layout.addWidget(self.li_files)
+        main_layout.addWidget(self.btn_select_folder)
+        main_layout.addWidget(self.le_password)
+        main_layout.addWidget(self.btn_submit)
+
+        self.setLayout(main_layout)
+
+
+    # === Slots ===
+    def handle_btn_select_folder(self):
+        self.li_files.clear()
+
+        self.filenames, selected_filter = QFileDialog.getOpenFileNames(
+            parent=self,
+            caption='Select Files',
+            directory=os.getcwd(),
+            filter='PDF Files (*.pdf)',
+            options=QFileDialog.Option.ShowDirsOnly
+        )
+
+        pdf_icon = QIcon(os.path.join(basedir, '..', 'resources', 'icons', 'acrobat-pdf.webp'))
+        for file in self.filenames:
+            self.li_files.addItem(QListWidgetItem(pdf_icon, os.path.basename(file)))
+
+        self.lb_files.setText('Files to be processed:')
+        self.btn_submit.setEnabled(True)
+
+    def handle_btn_submit(self):
+        # progress_bar = QProgressDialog('Processing Data', None, 0, 100, self)
+        # progress_bar.setValue(0)
+        # progress_increment = 100 // len(self.filenames)
+        already_encrypted_files = []
+        is_encrypted = False
+        opened_files = []
+        is_opened_file = False
+        encryption_succesful = []
+
+        for pdf_file in self.filenames:
+
+            statement_reader = PdfReader(pdf_file)
+            try:
+                statement_writer = PdfWriter(clone_from=statement_reader)
+            except errors.FileNotDecryptedError:
+                is_encrypted = True
+                already_encrypted_files.append(os.path.basename(pdf_file))
+                continue
+
+            # Add a password to the pdf file
+            statement_password = self.le_password.text()
+            statement_writer.encrypt(statement_password, algorithm="AES-256")
+
+            # Save the new PDF to a file
+            try:
+                with open(pdf_file, "wb") as f:
+                    statement_writer.write(f)
+                    encryption_succesful.append(os.path.basename(pdf_file))
+            except PermissionError:
+                is_opened_file = True
+                opened_files.append(os.path.basename(pdf_file))
+                continue
+            # progress_bar.setValue(progress_bar.value() + progress_increment)
+
+        self.li_files.clear()
+        self.le_password.clear()
+
+        if is_encrypted:
+            QMessageBox.warning(
+                self,
+                'Files encryption',
+                f'Already encrypted files:\n{'\n'.join(already_encrypted_files)}',
+                defaultButton=QMessageBox.StandardButton.Ok)
+        if is_opened_file:
+            QMessageBox.warning(
+                self,
+                'Files encryption',
+                f'Close\n{'\n'.join(opened_files)}\nand try again',
+                defaultButton=QMessageBox.StandardButton.Ok)
+        
+        if encryption_succesful:
+            QMessageBox.information(
+                self,
+                'Files encryption',
+                f'Encryption Succesful:\n{'\n'.join(encryption_succesful)}',
+                defaultButton=QMessageBox.StandardButton.Ok)
