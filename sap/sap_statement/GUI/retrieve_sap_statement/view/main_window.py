@@ -21,7 +21,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.setWindowTitle('Retrieve SAP Statement')
         self.setWindowIcon(QIcon(os.path.join(basedir, '..', 'resources', 'icons', 'loblaw.ico')))
-        self.setFixedSize(400, 300) # width, height
+        self.setFixedSize(414, 600) # width, height
 
         # Create a Tab layout
         tab_widget = QTabWidget()
@@ -41,5 +41,3 @@ class MainWindow(QMainWindow):
 
         # Set the central widget of the Main window. This widget is the QTabWidget
         self.setCentralWidget(tab_widget)
-
-        

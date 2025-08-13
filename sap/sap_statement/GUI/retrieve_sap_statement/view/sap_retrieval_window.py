@@ -4,6 +4,7 @@ from PyQt6.QtGui import QRegularExpressionValidator
 from PyQt6.QtCore import QRegularExpression, Qt
 from retrieve_sap_statement.controller.main_controller import execute
 from retrieve_sap_statement.model.EmailSender import EmailSender
+from retrieve_sap_statement.view.section.send_email import SendEmailSection
 import calendar
 from pypdf import PdfReader, PdfWriter
 from datetime import datetime
@@ -53,27 +54,10 @@ class SAP_Retrieval(QWidget):
         # Label for messages
         self.lb_message = QLabel()
         self.lb_message.hide()
-        self.lb_message.setFixedHeight(30)
+        self.lb_message.setFixedHeight(20)
         self.lb_message.setStyleSheet('''
             color: red;
         ''')
-
-        # === Send Email Option ===
-        # Check Box
-        self.check_box = QCheckBox('Send Email')
-        self.check_box .setFixedHeight(40)
-        self.check_box.setCheckState(Qt.CheckState.Unchecked)
-        # Check Box signals
-        self.check_box.stateChanged.connect(self.state_changed)
-
-        # Line Edit (Customer email)
-        self.le_cx_email = QLineEdit()
-        self.le_cx_email .setFixedHeight(40)
-        self.le_cx_email.setPlaceholderText('email@address.com')
-        rx_email = QRegularExpression('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$')
-        self.le_cx_email.setValidator(QRegularExpressionValidator(rx_email, self))
-        self.le_cx_email.hide()
-        self.le_cx_email.textChanged.connect(self.hide_label)
 
         # === Layouts ===
         # Create Vertical layout and add Widgets to the layout
@@ -87,20 +71,24 @@ class SAP_Retrieval(QWidget):
         horizontal_layout.addWidget(self.rb_sdm)
         horizontal_layout.addWidget(self.rb_medisystem)
 
-        email_layout = QVBoxLayout()
-        email_layout.addWidget(self.check_box)
-        email_layout.addWidget(self.le_cx_email)
-
         # Add Horizontal layout to Vertical layout
         vertical_layout.addLayout(horizontal_layout)
-        vertical_layout.addLayout(email_layout)
+
+        # Add Send Email section to vertical Layout
+        self.email_section = SendEmailSection()
+        vertical_layout.addWidget(self.email_section)
 
         # Add button
         vertical_layout.addWidget(button)
-        self.setLayout(vertical_layout)
+
+        main_layout = QVBoxLayout()
+        main_layout.addStretch(1)
+        main_layout.addLayout(vertical_layout)
+        main_layout.addStretch(1)
+        self.setLayout(main_layout)
 
     def retrieve_statement(self):
-        if self.validate_account_number() and self.validate_month() and self.validate_email():
+        if self.validate_account_number() and self.validate_month() and self.email_section.validate_email():
             month = self.parse_month()
             if self.rb_sdm.isChecked():
                 company = 'sdm'
@@ -109,7 +97,7 @@ class SAP_Retrieval(QWidget):
 
             context = execute(self, self.le_account_number.text(), month, company)
 
-            if self.check_box.checkState() == Qt.CheckState.Checked:
+            if self.email_section.check_box.checkState() == Qt.CheckState.Checked:
                 if context.get('file_name'):
                     download_path = os.path.join('C:\\', 'Users', os.getlogin(), 'Downloads')
                     month_name = calendar.month_name[int(self.le_month.text())]                    
@@ -132,9 +120,9 @@ class SAP_Retrieval(QWidget):
                     # Send encrypted statement
                     email_statement = EmailSender()
                     email_statement.setup_template(os.path.join(basedir, '..', 'resources', 'email_templates', company, 'monthly_statement_template.msg'))
-                    email_statement.set_recipients(self.le_cx_email.text())
+                    email_statement.set_recipients(self.email_section.le_cx_email.text())
                     email_statement.set_subject(f'{month_name} Statement')
-                    email_statement.set_attachments(statement_pdf)
+                    email_statement.set_attachments([statement_pdf])
                     email_statement.update_body(template_values)
                     email_statement.send_email()
 
@@ -142,19 +130,19 @@ class SAP_Retrieval(QWidget):
                     template_values['password_field'] = f'<b>{statement_password}</b>'
                     email_password = EmailSender()
                     email_password.setup_template(os.path.join(basedir, '..', 'resources', 'email_templates', company, 'monthly_statement_password_template.msg'))
-                    email_password.set_recipients(self.le_cx_email.text())
+                    email_password.set_recipients(self.email_section.le_cx_email.text())
                     email_password.set_subject(f'{month_name} Statement - Password')
                     email_password.update_body(template_values)
                     email_password.send_email()
                     
                     QMessageBox.information(self,
                                     'Email Sent',
-                                    f'Email to {self.le_cx_email.text()} was sent successfully')
+                                    f'Email to {self.email_section.le_cx_email.text()} was sent successfully')
 
             self.le_account_number.clear()
             self.le_month.clear()
-            self.le_cx_email.clear()
-            self.check_box.setCheckState(Qt.CheckState.Unchecked)
+            self.email_section.le_cx_email.clear()
+            self.email_section.check_box.setCheckState(Qt.CheckState.Unchecked)
 
     # Field validations
     def validate_month(self):
@@ -180,22 +168,6 @@ class SAP_Retrieval(QWidget):
             return False
         
         return True
-    
-    def validate_email(self):
-        if self.check_box.checkState() == Qt.CheckState.Checked:
-            if not self.le_cx_email.text():
-                self.lb_message.show()
-                self.lb_message.setText('Missing Email Address')
-                self.le_cx_email.setFocus()
-                return False
-
-            if not self.le_cx_email.hasAcceptableInput():
-                self.lb_message.show()
-                self.lb_message.setText('Invalid email address')
-                self.le_cx_email.setFocus()
-                return False
-            
-        return True
 
     def parse_month(self) -> str:
         """return a valid month (1-12 or 01-12)."""
@@ -204,11 +176,3 @@ class SAP_Retrieval(QWidget):
     
     def hide_label(self):
         self.lb_message.hide()
-
-    def state_changed(self, state):
-        if Qt.CheckState(state) == Qt.CheckState.Checked:
-            self.le_cx_email.show()
-        else:
-            self.le_cx_email.hide()
-            self.le_cx_email.clear()
-        self.hide_label()

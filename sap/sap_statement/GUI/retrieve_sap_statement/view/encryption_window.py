@@ -4,6 +4,8 @@ from PyQt6.QtGui import QIcon
 from PyQt6.QtCore import Qt
 from time import sleep
 from pypdf import PdfReader, PdfWriter, errors
+from retrieve_sap_statement.view.section.send_email import SendEmailSection
+from retrieve_sap_statement.model.EmailSender import EmailSender
 
 
 basedir = os.path.dirname(__file__)
@@ -30,6 +32,10 @@ class Encryption(QWidget):
         self.li_files.setSelectionMode(QListWidget.SelectionMode.ExtendedSelection)
 
         # Text
+        self.le_account_number = QLineEdit()
+        self.le_account_number.setPlaceholderText('Account Number')
+        self.le_account_number.setFixedHeight(40)
+
         self.le_password = QLineEdit()
         self.le_password.setPlaceholderText('Encryption Password')
         self.le_password.setFixedHeight(40)
@@ -38,12 +44,17 @@ class Encryption(QWidget):
         self.btn_select_folder.clicked.connect(self.handle_btn_select_folder)
         self.btn_submit.clicked.connect(self.handle_btn_submit)
 
+        #=== Sections ===
+        self.email_section = SendEmailSection()
+
         # === Create and add widgets to Vertical layout ===
         main_layout = QVBoxLayout()
         main_layout.addWidget(self.lb_files)
         main_layout.addWidget(self.li_files)
         main_layout.addWidget(self.btn_select_folder)
+        main_layout.addWidget(self.le_account_number)
         main_layout.addWidget(self.le_password)
+        main_layout.addWidget(self.email_section)
         main_layout.addWidget(self.btn_submit)
 
         self.setLayout(main_layout)
@@ -96,15 +107,12 @@ class Encryption(QWidget):
             try:
                 with open(pdf_file, "wb") as f:
                     statement_writer.write(f)
-                    encryption_succesful.append(os.path.basename(pdf_file))
+                    encryption_succesful.append(pdf_file)
             except PermissionError:
                 is_opened_file = True
                 opened_files.append(os.path.basename(pdf_file))
                 continue
             # progress_bar.setValue(progress_bar.value() + progress_increment)
-
-        self.li_files.clear()
-        self.le_password.clear()
 
         if is_encrypted:
             QMessageBox.warning(
@@ -123,5 +131,34 @@ class Encryption(QWidget):
             QMessageBox.information(
                 self,
                 'Files encryption',
-                f'Encryption Succesful:\n{'\n'.join(encryption_succesful)}',
+                f'Encryption Succesful:\n{'\n'.join([os.path.basename(file) for file in encryption_succesful])}',
                 defaultButton=QMessageBox.StandardButton.Ok)
+            
+        if self.email_section.check_box.checkState() == Qt.CheckState.Checked:
+            template_values = {'account_field' : f'<b>{self.le_account_number.text()}</b>'}
+            email = EmailSender()
+            email.setup_template(os.path.join(basedir, '..', 'resources', 'email_templates', 'medi', 'monthly_statements_template.msg'))
+            email.set_recipients(self.email_section.le_cx_email.text())
+            email.set_subject('Monthly Statements')
+            email.set_attachments(encryption_succesful)
+            email.update_body(template_values)
+
+            template_values['password_field'] = f'<b>{self.le_password.text()}</b>'
+            email_password = EmailSender()
+            email_password.setup_template(os.path.join(basedir, '..', 'resources', 'email_templates', 'medi', 'monthly_statement_password_template.msg'))
+            email_password.set_recipients(self.email_section.le_cx_email.text())
+            email_password.set_subject('Monthly Statements')
+            email_password.update_body(template_values)
+
+            if is_encrypted or is_opened_file:
+                email.display_email()
+                email_password.display_email()
+            else:
+                email.send_email()
+                email_password.send_email()
+        
+        self.li_files.clear()
+        self.le_password.clear()
+        self.le_account_number.clear()
+        self.email_section.le_cx_email.clear()
+        self.email_section.check_box.setCheckState(Qt.CheckState.Unchecked)

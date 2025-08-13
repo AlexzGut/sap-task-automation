@@ -12,7 +12,7 @@ class EmailSender:
             raise FileNotFoundError(f'Template not found at: {template_path}')
         self._mail = self.outlook.CreateItemFromTemplate(template_path)
 
-    def set_recipients(self, recipients : List[str]) -> None:
+    def set_recipients(self, recipients : str) -> None:
         self.email_exists()
         self._mail.To = recipients
 
@@ -20,16 +20,19 @@ class EmailSender:
         self.email_exists()
         self._mail.Subject = subject
 
-    def set_attachments(self, file_path : str) -> None:
+    def set_attachments(self, file_paths : list[str]) -> None:
         self.email_exists()
-        self._mail.Attachments.Add(file_path)
+        if file_paths:
+            for file in file_paths:
+                self._mail.Attachments.Add(file)
 
     def update_body(self, replacements : Dict) -> None:
         self.email_exists()
-        email_body = self._mail.HTMLBody
-        for key, value in replacements.items():
-            email_body = email_body.replace(key, value)
-        self._mail.HTMLBody = email_body
+        if replacements:
+            email_body = self._mail.HTMLBody
+            for key, value in replacements.items():
+                email_body = email_body.replace(key, value)
+            self._mail.HTMLBody = email_body
 
     def send_email(self) -> None:
         self.email_exists()
@@ -45,4 +48,3 @@ class EmailSender:
     def email_exists(self) -> None:
         if not self._mail:
             raise ValueError('No email template specified')
-
