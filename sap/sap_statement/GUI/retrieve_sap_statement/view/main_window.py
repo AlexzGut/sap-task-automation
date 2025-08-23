@@ -1,9 +1,10 @@
 import os
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QMainWindow, QLineEdit, QLabel, QPushButton, QRadioButton, QButtonGroup, QCheckBox, QMessageBox, QTabWidget
+from PyQt6.QtWidgets import QMainWindow, QTabWidget
 from PyQt6.QtGui import QIcon
 from retrieve_sap_statement.controller.main_controller import execute
 from retrieve_sap_statement.view.sap_retrieval_window import SAP_Retrieval
 from retrieve_sap_statement.view.encryption_window import Encryption
+from retrieve_sap_statement.view.mer_window import MedicalExpenseReport
 
 
 basedir = os.path.dirname(__file__)
@@ -30,10 +31,12 @@ class MainWindow(QMainWindow):
         # Create QWidgets to add to the TabWidget 
         sap_retrieval_container = SAP_Retrieval()
         encryption = Encryption()
+        mer = MedicalExpenseReport()
 
         tabs = {
             sap_retrieval_container: QIcon(os.path.join(basedir, '..', 'resources', 'icons', 'tabs', 'document-pdf.png')),
-            encryption: QIcon(os.path.join(basedir, '..', 'resources', 'icons', 'tabs', 'lock.png'))
+            encryption: QIcon(os.path.join(basedir, '..', 'resources', 'icons', 'tabs', 'lock.png')),
+            mer : QIcon(os.path.join(basedir, '..', 'resources', 'icons', 'tabs', 'document-text.png'))
         }
         for tab, label in tabs.items():
             tab_widget.addTab(tab, label, None)
