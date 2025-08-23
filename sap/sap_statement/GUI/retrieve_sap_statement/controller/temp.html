@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Expense Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        #logo img {
+            width: 200px;
+        }
+
+        header {
+            font-size: 14px;
+        }
+
+        #titles {
+            margin-bottom: 10px;
+        }
+
+        #titles h1 {
+            text-align: center;
+            font-size: 14px;
+            margin-bottom: 0px;
+            margin-top: 0px;
+        }
+
+        header table {
+            width: auto;
+            table-layout: auto;
+        }
+
+        header table th {
+            padding-right: 20px;
+            padding-bottom: 8px;
+            text-align: left;
+        }
+
+        header table td {
+            padding-left: 5px;
+            text-align: left;
+        }
+
+        main {
+            font-size: 10px;
+        }
+
+        .dataframe {
+            width: 100%;
+            border-collapse: collapse;
+            /* table-layout: auto; */
+        }
+
+        .dataframe th,
+        .dataframe td {
+            padding-right: 15px;
+        }
+
+        .dataframe th {
+            padding-bottom: 10px;
+        }
+
+        .dataframe td {
+            padding-bottom: 5px;
+        }
+
+        .dataframe thead tr th span {
+            display: inline-block;
+            border-bottom: 1px solid #000;
+            padding-bottom: 2px;
+        }
+
+        .dataframe thead tr {
+            text-align: left;
+        }
+
+        #totals {
+            border-top: 1px solid #000;
+            border-bottom: 1px solid #000;
+        }
+    </style>
+</head>
+
+<body>
+    <section id="logo">
+        <img src="c:\Users\alexgut\Desktop\sap-task-automation\sap\sap_statement\GUI\retrieve_sap_statement\controller\..\resources\img\mediSystem_logo.png" alt="mediSystem_logo">
+    </section>
+    <header>
+        <section id="titles">
+            <h1 style="font-size: 16px; margin-bottom: 10px;">Patient Medical Expense Report</h1>
+            <h1>243 Consumers Rd, Toronto, ON M2J 4W8</h1>
+            <h1>Tel: 416-499-9760 | Toll-free: 1-833-633-4797 | Fax: 416-443-6234</h1>
+        </section>
+        <br>
+        <table>
+            <tr>
+                <th>Resident Name</th>
+                <td>Betty Wilson</td>
+            </tr>
+            <tr>
+                <th>Resident Home/Facility</th>
+                <td>Riverview Gardens 3E (2)</td>
+            </tr>
+        </table>
+    </header>
+    <br>
+    <main>
+        
+    <table class="dataframe">
+    <thead>
+    <tr><th><span>Rx Date</span></th><th><span>Transaction #</span></th><th><span>Doctor Name</span></th><th><span>Quantity</span></th><th><span>Rx #</span></th><th><span>Drug # Din</span></th><th><span>Rx Name</span></th><th><span>Total Price</span></th><th><span>Total Fee</span></th><th><span>Total Plan Paid</span></th><th><span>Total 3rd Party Pays</span></th><th><span>Patient Pays</span></th></tr>
+    </thead>
+      <tbody>    <tr>      <td>2025-07-03</td>      <td>120331839</td>      <td>Anthony Richard Dixon</td>      <td>14.0</td>      <td>120235922</td>      <td>2374854</td>      <td>Ramipril 5mg</td>      <td>1.24</td>      <td>0.00</td>      <td>1.24</td>      <td>1.24</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-07-03</td>      <td>120331836</td>      <td>Anthony Richard Dixon</td>      <td>24.5</td>      <td>120235921</td>      <td>2353164</td>      <td>QUEtiapine 25mg</td>      <td>1.31</td>      <td>0.00</td>      <td>1.31</td>      <td>1.31</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-07-03</td>      <td>120331833</td>      <td>Anthony Richard Dixon</td>      <td>3.5</td>      <td>120235918</td>      <td>2411709</td>      <td>Auro-Mirtazapine 30mg</td>      <td>1.18</td>      <td>0.00</td>      <td>1.18</td>      <td>1.18</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-07-03</td>      <td>120331821</td>      <td>Anthony Richard Dixon</td>      <td>7.0</td>      <td>120235962</td>      <td>2402106</td>      <td>Mar-Donepezil 10mg</td>      <td>3.48</td>      <td>0.00</td>      <td>3.48</td>      <td>3.48</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-07-03</td>      <td>120331814</td>      <td>Anthony Richard Dixon</td>      <td>3.5</td>      <td>120235913</td>      <td>360279</td>      <td>Apo-Chlorthalidone 50mg</td>      <td>0.48</td>      <td>0.00</td>      <td>0.48</td>      <td>0.48</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-07-03</td>      <td>120331809</td>      <td>Anthony Richard Dixon</td>      <td>7.0</td>      <td>120235912</td>      <td>2392933</td>      <td>Mylan-Atorvastatin 10mg</td>      <td>1.32</td>      <td>0.00</td>      <td>1.32</td>      <td>1.32</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-07-03</td>      <td>120331805</td>      <td>Anthony Richard Dixon</td>      <td>3.5</td>      <td>120235911</td>      <td>2506688</td>      <td>ARIPiprazole 2mg</td>      <td>3.07</td>      <td>0.00</td>      <td>3.07</td>      <td>3.07</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-07-03</td>      <td>120331801</td>      <td>Anthony Richard Dixon</td>      <td>7.0</td>      <td>120235910</td>      <td>2331284</td>      <td>amLODIPine 5mg</td>      <td>1.02</td>      <td>0.00</td>      <td>1.02</td>      <td>1.02</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-07-03</td>      <td>120331793</td>      <td>Anthony Richard Dixon</td>      <td>42.0</td>      <td>120235906</td>      <td>9857143</td>      <td>Apo-Acetaminophen (GS) 325mg</td>      <td>0.52</td>      <td>0.00</td>      <td>0.52</td>      <td>0.52</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-07-10</td>      <td>120368237</td>      <td>Anthony Richard Dixon</td>      <td>14.0</td>      <td>120235922</td>      <td>2374854</td>      <td>Ramipril 5mg</td>      <td>1.24</td>      <td>0.00</td>      <td>1.24</td>      <td>1.24</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-07-10</td>      <td>120368233</td>      <td>Anthony Richard Dixon</td>      <td>24.5</td>      <td>120235921</td>      <td>2353164</td>      <td>QUEtiapine 25mg</td>      <td>1.31</td>      <td>0.00</td>      <td>1.31</td>      <td>1.31</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-07-10</td>      <td>120368229</td>      <td>Anthony Richard Dixon</td>      <td>3.5</td>      <td>120235918</td>      <td>2411709</td>      <td>Auro-Mirtazapine 30mg</td>      <td>1.18</td>      <td>0.00</td>      <td>1.18</td>      <td>1.18</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-07-10</td>      <td>120368215</td>      <td>Anthony Richard Dixon</td>      <td>7.0</td>      <td>120235962</td>      <td>2402106</td>      <td>Mar-Donepezil 10mg</td>      <td>3.48</td>      <td>0.00</td>      <td>3.48</td>      <td>3.48</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-07-10</td>      <td>120368206</td>      <td>Anthony Richard Dixon</td>      <td>3.5</td>      <td>120235913</td>      <td>360279</td>      <td>Apo-Chlorthalidone 50mg</td>      <td>0.48</td>      <td>0.00</td>      <td>0.48</td>      <td>0.48</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-07-10</td>      <td>120368202</td>      <td>Anthony Richard Dixon</td>      <td>7.0</td>      <td>120235912</td>      <td>2392933</td>      <td>Mylan-Atorvastatin 10mg</td>      <td>1.32</td>      <td>0.00</td>      <td>1.32</td>      <td>1.32</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-07-10</td>      <td>120368199</td>      <td>Anthony Richard Dixon</td>      <td>3.5</td>      <td>120235911</td>      <td>2506688</td>      <td>ARIPiprazole 2mg</td>      <td>3.07</td>      <td>0.00</td>      <td>3.07</td>      <td>3.07</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-07-10</td>      <td>120368193</td>      <td>Anthony Richard Dixon</td>      <td>7.0</td>      <td>120235910</td>      <td>2331284</td>      <td>amLODIPine 5mg</td>      <td>1.02</td>      <td>0.00</td>      <td>1.02</td>      <td>1.02</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-07-10</td>      <td>120368184</td>      <td>Anthony Richard Dixon</td>      <td>42.0</td>      <td>120235906</td>      <td>9857143</td>      <td>Apo-Acetaminophen (GS) 325mg</td>      <td>0.52</td>      <td>0.00</td>      <td>0.52</td>      <td>0.52</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-07-17</td>      <td>120404270</td>      <td>Anthony Richard Dixon</td>      <td>14.0</td>      <td>120235922</td>      <td>2374854</td>      <td>Ramipril 5mg</td>      <td>1.24</td>      <td>0.00</td>      <td>1.24</td>      <td>1.24</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-07-17</td>      <td>120404267</td>      <td>Anthony Richard Dixon</td>      <td>24.5</td>      <td>120235921</td>      <td>2353164</td>      <td>QUEtiapine 25mg</td>      <td>1.31</td>      <td>0.00</td>      <td>1.31</td>      <td>1.31</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-07-17</td>      <td>120404264</td>      <td>Anthony Richard Dixon</td>      <td>3.5</td>      <td>120235918</td>      <td>2411709</td>      <td>Auro-Mirtazapine 30mg</td>      <td>1.18</td>      <td>0.00</td>      <td>1.18</td>      <td>1.18</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-07-17</td>      <td>120404252</td>      <td>Anthony Richard Dixon</td>      <td>7.0</td>      <td>120235962</td>      <td>2402106</td>      <td>Mar-Donepezil 10mg</td>      <td>3.48</td>      <td>0.00</td>      <td>3.48</td>      <td>3.48</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-07-17</td>      <td>120404245</td>      <td>Anthony Richard Dixon</td>      <td>3.5</td>      <td>120235913</td>      <td>360279</td>      <td>Apo-Chlorthalidone 50mg</td>      <td>0.48</td>      <td>0.00</td>      <td>0.48</td>      <td>0.48</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-07-17</td>      <td>120404243</td>      <td>Anthony Richard Dixon</td>      <td>7.0</td>      <td>120235912</td>      <td>2392933</td>      <td>Mylan-Atorvastatin 10mg</td>      <td>1.32</td>      <td>0.00</td>      <td>1.32</td>      <td>1.32</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-07-17</td>      <td>120404241</td>      <td>Anthony Richard Dixon</td>      <td>3.5</td>      <td>120235911</td>      <td>2506688</td>      <td>ARIPiprazole 2mg</td>      <td>3.07</td>      <td>0.00</td>      <td>3.07</td>      <td>3.07</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-07-17</td>      <td>120404237</td>      <td>Anthony Richard Dixon</td>      <td>7.0</td>      <td>120235910</td>      <td>2331284</td>      <td>amLODIPine 5mg</td>      <td>1.02</td>      <td>0.00</td>      <td>1.02</td>      <td>1.02</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-07-17</td>      <td>120404232</td>      <td>Anthony Richard Dixon</td>      <td>42.0</td>      <td>120235906</td>      <td>9857143</td>      <td>Apo-Acetaminophen (GS) 325mg</td>      <td>0.52</td>      <td>0.00</td>      <td>0.52</td>      <td>0.52</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-07-21</td>      <td>120423403</td>      <td>Colin McCabe</td>      <td>60.0</td>      <td>120423403</td>      <td>2440342</td>      <td>Rosiver Cream 1%</td>      <td>266.05</td>      <td>11.99</td>      <td>254.06</td>      <td>266.05</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-07-24</td>      <td>120447310</td>      <td>Anthony Richard Dixon</td>      <td>10.0</td>      <td>120447308</td>      <td>2231603</td>      <td>Apo-Cetirizine 10mg</td>      <td>5.81</td>      <td>1.63</td>      <td>4.18</td>      <td>5.81</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-07-24</td>      <td>120447308</td>      <td>Anthony Richard Dixon</td>      <td>60.0</td>      <td>120447308</td>      <td>2440342</td>      <td>Rosiver Cream 1%</td>      <td>266.05</td>      <td>11.99</td>      <td>254.06</td>      <td>266.05</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-07-24</td>      <td>120440705</td>      <td>Anthony Richard Dixon</td>      <td>14.0</td>      <td>120235922</td>      <td>2374854</td>      <td>Ramipril 5mg</td>      <td>1.24</td>      <td>0.00</td>      <td>1.24</td>      <td>1.24</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-07-24</td>      <td>120440702</td>      <td>Anthony Richard Dixon</td>      <td>24.5</td>      <td>120235921</td>      <td>2353164</td>      <td>QUEtiapine 25mg</td>      <td>1.31</td>      <td>0.00</td>      <td>1.31</td>      <td>1.31</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-07-24</td>      <td>120440699</td>      <td>Anthony Richard Dixon</td>      <td>3.5</td>      <td>120235918</td>      <td>2411709</td>      <td>Auro-Mirtazapine 30mg</td>      <td>1.18</td>      <td>0.00</td>      <td>1.18</td>      <td>1.18</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-07-24</td>      <td>120440685</td>      <td>Anthony Richard Dixon</td>      <td>7.0</td>      <td>120235962</td>      <td>2402106</td>      <td>Mar-Donepezil 10mg</td>      <td>3.48</td>      <td>0.00</td>      <td>3.48</td>      <td>3.48</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-07-24</td>      <td>120440677</td>      <td>Anthony Richard Dixon</td>      <td>3.5</td>      <td>120235913</td>      <td>360279</td>      <td>Apo-Chlorthalidone 50mg</td>      <td>0.48</td>      <td>0.00</td>      <td>0.48</td>      <td>0.48</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-07-24</td>      <td>120440675</td>      <td>Anthony Richard Dixon</td>      <td>7.0</td>      <td>120235912</td>      <td>2348705</td>      <td>Atorvastatin 10mg</td>      <td>1.32</td>      <td>0.00</td>      <td>1.32</td>      <td>1.32</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-07-24</td>      <td>120440672</td>      <td>Anthony Richard Dixon</td>      <td>3.5</td>      <td>120235911</td>      <td>2506688</td>      <td>ARIPiprazole 2mg</td>      <td>3.07</td>      <td>0.00</td>      <td>3.07</td>      <td>3.07</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-07-24</td>      <td>120440669</td>      <td>Anthony Richard Dixon</td>      <td>7.0</td>      <td>120235910</td>      <td>2331284</td>      <td>amLODIPine 5mg</td>      <td>1.02</td>      <td>0.00</td>      <td>1.02</td>      <td>1.02</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-07-24</td>      <td>120440662</td>      <td>Anthony Richard Dixon</td>      <td>42.0</td>      <td>120235906</td>      <td>9857143</td>      <td>Apo-Acetaminophen (GS) 325mg</td>      <td>0.52</td>      <td>0.00</td>      <td>0.52</td>      <td>0.52</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-07-31</td>      <td>120477351</td>      <td>Anthony Richard Dixon</td>      <td>14.0</td>      <td>120235922</td>      <td>2374854</td>      <td>Ramipril 5mg</td>      <td>1.24</td>      <td>0.00</td>      <td>1.24</td>      <td>1.24</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-07-31</td>      <td>120477348</td>      <td>Anthony Richard Dixon</td>      <td>24.5</td>      <td>120235921</td>      <td>2353164</td>      <td>QUEtiapine 25mg</td>      <td>1.31</td>      <td>0.00</td>      <td>1.31</td>      <td>1.31</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-07-31</td>      <td>120477345</td>      <td>Anthony Richard Dixon</td>      <td>3.5</td>      <td>120235918</td>      <td>2411709</td>      <td>Auro-Mirtazapine 30mg</td>      <td>1.18</td>      <td>0.00</td>      <td>1.18</td>      <td>1.18</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-07-31</td>      <td>120477335</td>      <td>Anthony Richard Dixon</td>      <td>7.0</td>      <td>120235962</td>      <td>2402106</td>      <td>Mar-Donepezil 10mg</td>      <td>3.48</td>      <td>0.00</td>      <td>3.48</td>      <td>3.48</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-07-31</td>      <td>120477328</td>      <td>Anthony Richard Dixon</td>      <td>3.5</td>      <td>120235913</td>      <td>360279</td>      <td>Apo-Chlorthalidone 50mg</td>      <td>0.48</td>      <td>0.00</td>      <td>0.48</td>      <td>0.48</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-07-31</td>      <td>120477321</td>      <td>Anthony Richard Dixon</td>      <td>7.0</td>      <td>120235912</td>      <td>2348705</td>      <td>Atorvastatin 10mg</td>      <td>1.32</td>      <td>0.00</td>      <td>1.32</td>      <td>1.32</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-07-31</td>      <td>120477318</td>      <td>Anthony Richard Dixon</td>      <td>3.5</td>      <td>120235911</td>      <td>2506688</td>      <td>ARIPiprazole 2mg</td>      <td>3.07</td>      <td>0.00</td>      <td>3.07</td>      <td>3.07</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-07-31</td>      <td>120477315</td>      <td>Anthony Richard Dixon</td>      <td>7.0</td>      <td>120235910</td>      <td>2331284</td>      <td>amLODIPine 5mg</td>      <td>1.02</td>      <td>0.00</td>      <td>1.02</td>      <td>1.02</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-07-31</td>      <td>120477310</td>      <td>Anthony Richard Dixon</td>      <td>42.0</td>      <td>120235906</td>      <td>9857143</td>      <td>Apo-Acetaminophen (GS) 325mg</td>      <td>0.52</td>      <td>0.00</td>      <td>0.52</td>      <td>0.52</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-08-07</td>      <td>120513816</td>      <td>Anthony Richard Dixon</td>      <td>14.0</td>      <td>120235922</td>      <td>2374854</td>      <td>Ramipril 5mg</td>      <td>1.24</td>      <td>0.00</td>      <td>1.24</td>      <td>1.24</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-08-07</td>      <td>120513812</td>      <td>Anthony Richard Dixon</td>      <td>24.5</td>      <td>120235921</td>      <td>2353164</td>      <td>QUEtiapine 25mg</td>      <td>1.31</td>      <td>0.00</td>      <td>1.31</td>      <td>1.31</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-08-07</td>      <td>120513809</td>      <td>Anthony Richard Dixon</td>      <td>3.5</td>      <td>120235918</td>      <td>2411709</td>      <td>Auro-Mirtazapine 30mg</td>      <td>1.18</td>      <td>0.00</td>      <td>1.18</td>      <td>1.18</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-08-07</td>      <td>120513795</td>      <td>Anthony Richard Dixon</td>      <td>7.0</td>      <td>120235962</td>      <td>2402106</td>      <td>Mar-Donepezil 10mg</td>      <td>3.48</td>      <td>0.00</td>      <td>3.48</td>      <td>3.48</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-08-07</td>      <td>120513787</td>      <td>Anthony Richard Dixon</td>      <td>3.5</td>      <td>120235913</td>      <td>360279</td>      <td>Apo-Chlorthalidone 50mg</td>      <td>0.48</td>      <td>0.00</td>      <td>0.48</td>      <td>0.48</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-08-07</td>      <td>120513780</td>      <td>Anthony Richard Dixon</td>      <td>7.0</td>      <td>120235912</td>      <td>2348705</td>      <td>Atorvastatin 10mg</td>      <td>1.32</td>      <td>0.00</td>      <td>1.32</td>      <td>1.32</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-08-07</td>      <td>120513777</td>      <td>Anthony Richard Dixon</td>      <td>3.5</td>      <td>120235911</td>      <td>2506688</td>      <td>ARIPiprazole 2mg</td>      <td>3.07</td>      <td>0.00</td>      <td>3.07</td>      <td>3.07</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-08-07</td>      <td>120513773</td>      <td>Anthony Richard Dixon</td>      <td>7.0</td>      <td>120235910</td>      <td>2331284</td>      <td>amLODIPine 5mg</td>      <td>1.02</td>      <td>0.00</td>      <td>1.02</td>      <td>1.02</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-08-07</td>      <td>120513766</td>      <td>Anthony Richard Dixon</td>      <td>42.0</td>      <td>120235906</td>      <td>9857143</td>      <td>Apo-Acetaminophen (GS) 325mg</td>      <td>0.52</td>      <td>0.00</td>      <td>0.52</td>      <td>0.52</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-08-14</td>      <td>120550868</td>      <td>Anthony Richard Dixon</td>      <td>14.0</td>      <td>120235922</td>      <td>2374854</td>      <td>Ramipril 5mg</td>      <td>1.24</td>      <td>0.00</td>      <td>1.24</td>      <td>1.24</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-08-14</td>      <td>120550863</td>      <td>Anthony Richard Dixon</td>      <td>24.5</td>      <td>120235921</td>      <td>2353164</td>      <td>QUEtiapine 25mg</td>      <td>1.31</td>      <td>0.00</td>      <td>1.31</td>      <td>1.31</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-08-14</td>      <td>120550858</td>      <td>Anthony Richard Dixon</td>      <td>3.5</td>      <td>120235918</td>      <td>2411709</td>      <td>Auro-Mirtazapine 30mg</td>      <td>1.18</td>      <td>0.00</td>      <td>1.18</td>      <td>1.18</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-08-14</td>      <td>120550842</td>      <td>Anthony Richard Dixon</td>      <td>7.0</td>      <td>120235962</td>      <td>2402106</td>      <td>Mar-Donepezil 10mg</td>      <td>3.48</td>      <td>0.00</td>      <td>3.48</td>      <td>3.48</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-08-14</td>      <td>120550835</td>      <td>Anthony Richard Dixon</td>      <td>3.5</td>      <td>120235913</td>      <td>360279</td>      <td>Apo-Chlorthalidone 50mg</td>      <td>0.48</td>      <td>0.00</td>      <td>0.48</td>      <td>0.48</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-08-14</td>      <td>120550826</td>      <td>Anthony Richard Dixon</td>      <td>7.0</td>      <td>120235912</td>      <td>2348705</td>      <td>Atorvastatin 10mg</td>      <td>1.32</td>      <td>0.00</td>      <td>1.32</td>      <td>1.32</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-08-14</td>      <td>120550822</td>      <td>Anthony Richard Dixon</td>      <td>3.5</td>      <td>120235911</td>      <td>2506688</td>      <td>ARIPiprazole 2mg</td>      <td>3.07</td>      <td>0.00</td>      <td>3.07</td>      <td>3.07</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-08-14</td>      <td>120550818</td>      <td>Anthony Richard Dixon</td>      <td>7.0</td>      <td>120235910</td>      <td>2331284</td>      <td>amLODIPine 5mg</td>      <td>1.02</td>      <td>0.00</td>      <td>1.02</td>      <td>1.02</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-08-14</td>      <td>120550807</td>      <td>Anthony Richard Dixon</td>      <td>42.0</td>      <td>120235906</td>      <td>9857143</td>      <td>Apo-Acetaminophen (GS) 325mg</td>      <td>0.52</td>      <td>0.00</td>      <td>0.52</td>      <td>0.52</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-08-14</td>      <td>120550835</td>      <td>Anthony Richard Dixon</td>      <td>3.5</td>      <td>120235913</td>      <td>360279</td>      <td>Apo-Chlorthalidone 50mg</td>      <td>-0.48</td>      <td>0.00</td>      <td>-0.48</td>      <td>-0.48</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-08-18</td>      <td>120570775</td>      <td>Anthony Richard Dixon</td>      <td>4.0</td>      <td>120570775</td>      <td>21474</td>      <td>Teva-hydroCHLOROthiazide 25mg</td>      <td>0.07</td>      <td>0.00</td>      <td>0.07</td>      <td>0.07</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-08-21</td>      <td>120588018</td>      <td>Anthony Richard Dixon</td>      <td>14.0</td>      <td>120235922</td>      <td>2374854</td>      <td>Ramipril 5mg</td>      <td>1.24</td>      <td>0.00</td>      <td>1.24</td>      <td>1.24</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-08-21</td>      <td>120588015</td>      <td>Anthony Richard Dixon</td>      <td>24.5</td>      <td>120235921</td>      <td>2353164</td>      <td>QUEtiapine 25mg</td>      <td>1.31</td>      <td>0.00</td>      <td>1.31</td>      <td>1.31</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-08-21</td>      <td>120588012</td>      <td>Anthony Richard Dixon</td>      <td>3.5</td>      <td>120235918</td>      <td>2411709</td>      <td>Auro-Mirtazapine 30mg</td>      <td>1.18</td>      <td>0.00</td>      <td>1.18</td>      <td>1.18</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-08-21</td>      <td>120588000</td>      <td>Anthony Richard Dixon</td>      <td>3.5</td>      <td>120570775</td>      <td>21474</td>      <td>Teva-hydroCHLOROthiazide 25mg</td>      <td>0.05</td>      <td>0.00</td>      <td>0.05</td>      <td>0.05</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-08-21</td>      <td>120587995</td>      <td>Anthony Richard Dixon</td>      <td>7.0</td>      <td>120235962</td>      <td>2402106</td>      <td>Mar-Donepezil 10mg</td>      <td>3.48</td>      <td>0.00</td>      <td>3.48</td>      <td>3.48</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-08-21</td>      <td>120587981</td>      <td>Anthony Richard Dixon</td>      <td>7.0</td>      <td>120235912</td>      <td>2348705</td>      <td>Atorvastatin 10mg</td>      <td>1.32</td>      <td>0.00</td>      <td>1.32</td>      <td>1.32</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-08-21</td>      <td>120587979</td>      <td>Anthony Richard Dixon</td>      <td>3.5</td>      <td>120235911</td>      <td>2506688</td>      <td>ARIPiprazole 2mg</td>      <td>3.07</td>      <td>0.00</td>      <td>3.07</td>      <td>3.07</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-08-21</td>      <td>120587975</td>      <td>Anthony Richard Dixon</td>      <td>7.0</td>      <td>120235910</td>      <td>2331284</td>      <td>amLODIPine 5mg</td>      <td>1.02</td>      <td>0.00</td>      <td>1.02</td>      <td>1.02</td>      <td>0.0</td>    </tr>    <tr>      <td>2025-08-21</td>      <td>120587964</td>      <td>Anthony Richard Dixon</td>      <td>42.0</td>      <td>120235906</td>      <td>9857143</td>      <td>Apo-Acetaminophen (GS) 325mg</td>      <td>0.52</td>      <td>0.00</td>      <td>0.52</td>      <td>0.52</td>      <td>0.0</td>    </tr>  </tbody>
+    <tr id="totals">
+        <th>Total</th>
+        <td></td><td></td><td></td><td></td><td></td><td></td>
+        <td>646.03</td>
+        <td>25.61</td>
+        <td>620.42</td>
+        <td>646.03</td>
+        <td>0.0</td>
+    </tr>
+    </table>
+    
+    </main>
+</body>
+</html>

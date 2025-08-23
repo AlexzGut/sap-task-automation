@@ -12,7 +12,7 @@ def generate_medical_expense_report(file_path : str, customer_name : str, lower_
     df = context['df']
 
     # Load HTML template
-    with open(os.path.join(basedir, 'resources', 'html_template','medical_expense_report.html'), 'r') as file:
+    with open(os.path.join(basedir, '..', 'resources', 'html_template','medical_expense_report.html'), 'r') as file:
         html_template = file.read()
 
     # Set Facility Name and Resident Name
@@ -49,14 +49,14 @@ def generate_medical_expense_report(file_path : str, customer_name : str, lower_
     report_html = report_html.replace('<data>', mer_html)
 
     # Replace <img alt="medisystem_logo"> tag with MediSystem Logo
-    medi_logo_tag = f'<img src="{os.path.join(basedir, 'resources', 'img', 'mediSystem_logo.png')}" alt="mediSystem_logo">'
+    medi_logo_tag = f'<img src="{os.path.join(basedir, '..', 'resources', 'img', 'mediSystem_logo.png')}" alt="mediSystem_logo">'
     report_html = report_html.replace('<img alt="medisystem_logo">', medi_logo_tag)
 
     # Save updated HTML
     with open(os.path.join(basedir, 'temp.html'), 'w') as file:
         file.write(report_html)
 
-    path_wkhtmltopdf = os.path.join(basedir, 'resources', 'wkhtmltopdf', 'wkhtmltopdf.exe') 
+    path_wkhtmltopdf = os.path.join(basedir, '..', 'resources', 'wkhtmltopdf', 'wkhtmltopdf.exe') 
     config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
     options = {
         'page-size': 'A4',

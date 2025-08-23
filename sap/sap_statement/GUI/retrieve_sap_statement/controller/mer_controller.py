@@ -6,8 +6,6 @@ import os
 
 
 def download_mer(patient_id : str, customer_name : str, lower_date : date=None, upper_date : date=None,  window=None):
-    print(lower_date)
-    print(lower_date)
     sap = SAPGUI()
     connection = sap.get_connection(window)
     if connection == None:

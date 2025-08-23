@@ -18,4 +18,5 @@ class ZN30038:
         session.findById("wnd[1]/usr/ctxtDY_PATH").text = file_path
         session.findById("wnd[1]/usr/ctxtDY_FILENAME").text = file_name
         session.findById("wnd[1]/tbar[0]/btn[0]").press() #Download Excel File
+        session.ActiveWindow.Close()
 
