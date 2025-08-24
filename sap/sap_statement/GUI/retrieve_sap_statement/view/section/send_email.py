@@ -18,10 +18,9 @@ class SendEmailSection(QWidget):
         # Line Edit (Customer email)
         self.le_cx_email = QLineEdit()
         self.le_cx_email .setFixedHeight(40)
-        self.le_cx_email.setPlaceholderText('email@address.com')
+        self.le_cx_email.setPlaceholderText('Email@Address.com')
         rx_email = QRegularExpression('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$')
         self.le_cx_email.setValidator(QRegularExpressionValidator(rx_email, self))
-        # self.le_cx_email.hide()
         self.le_cx_email.setVisible(False)
         self.le_cx_email.textChanged.connect(self.hide_label)
 
@@ -34,24 +33,22 @@ class SendEmailSection(QWidget):
         ''')
 
         # Add widgets to a layout
-        v_layout = QVBoxLayout()
-        v_layout.setContentsMargins(0,0,0,0)
-        v_layout.addWidget(self.check_box)
-        v_layout.addWidget(self.le_cx_email)
-        v_layout.addWidget(self.lb_message)
+        self.v_layout = QVBoxLayout()
+        self.v_layout.setContentsMargins(0,0,0,0)
+        self.v_layout.addWidget(self.check_box)
+        self.v_layout.addWidget(self.le_cx_email)
+        self.v_layout.addWidget(self.lb_message)
         
         # Set the section layout
-        self.setLayout(v_layout)
+        self.setLayout(self.v_layout)
 
     def hide_label(self):
         self.lb_message.hide()
 
     def state_changed(self, state):
         if Qt.CheckState(state) == Qt.CheckState.Checked:
-            # self.le_cx_email.show()
             self.le_cx_email.setVisible(True)
         else:
-            # self.le_cx_email.hide()
             self.le_cx_email.setVisible(False)
             self.le_cx_email.clear()
         self.hide_label()
