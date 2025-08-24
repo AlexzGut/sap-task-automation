@@ -5,7 +5,7 @@ from datetime import date
 import os
 
 
-def download_mer(patient_id : str, customer_name : str, lower_date : date=None, upper_date : date=None,  window=None):
+def download_mer(patient_id : str, customer_name : str, parameters : dict,  window=None):
     sap = SAPGUI()
     connection = sap.get_connection(window)
     if connection == None:
@@ -25,4 +25,4 @@ def download_mer(patient_id : str, customer_name : str, lower_date : date=None, 
     file_name = f'{patient_id}_{customer_name}.XLSX'
     zn.to_excel(session, file_dir, file_name)
 
-    generate_medical_expense_report(os.path.join(file_dir, file_name), customer_name, lower_date, upper_date)
+    generate_medical_expense_report(os.path.join(file_dir, file_name), customer_name, parameters)

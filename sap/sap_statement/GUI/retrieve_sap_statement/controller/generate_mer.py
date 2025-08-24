@@ -4,11 +4,11 @@ from datetime import date
 import os
 
 
-def generate_medical_expense_report(file_path : str, customer_name : str, lower_date : date=None, upper_date : date=None):
+def generate_medical_expense_report(file_path : str, customer_name : str, parameters : dict):
     basedir = os.path.dirname(__file__)
     pdf_filename = f'Medical Expense Report {customer_name}.pdf'
     
-    context = clean_data_pipeline(file_path, customer_name, lower_date, upper_date)
+    context = clean_data_pipeline(file_path, customer_name, parameters)
     df = context['df']
 
     # Load HTML template
@@ -52,9 +52,9 @@ def generate_medical_expense_report(file_path : str, customer_name : str, lower_
     medi_logo_tag = f'<img src="{os.path.join(basedir, '..', 'resources', 'img', 'mediSystem_logo.png')}" alt="mediSystem_logo">'
     report_html = report_html.replace('<img alt="medisystem_logo">', medi_logo_tag)
 
-    # Save updated HTML
-    with open(os.path.join(basedir, 'temp.html'), 'w') as file:
-        file.write(report_html)
+    # # Save updated HTML
+    # with open(os.path.join(basedir, 'temp.html'), 'w') as file:
+    #     file.write(report_html)
 
     path_wkhtmltopdf = os.path.join(basedir, '..', 'resources', 'wkhtmltopdf', 'wkhtmltopdf.exe') 
     config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
@@ -97,7 +97,7 @@ class Pipeline:
     
 
 # === Pipeline ===
-def clean_data_pipeline(file_path: str, customer_name : str, lower_date : date=None, upper_date : date=None) -> pd.DataFrame:
+def clean_data_pipeline(file_path: str, customer_name : str, parameters : dict) -> pd.DataFrame:
     """ Process a file and return a dataframe """
     context = Pipeline([
         PipelineStage(load_excel_file),
@@ -126,8 +126,8 @@ def clean_data_pipeline(file_path: str, customer_name : str, lower_date : date=N
             'Total 3rd Party Pays', 
             'Patient Pays',
             ],
-        'lower_date' : lower_date,
-        'upper_date' : upper_date,
+        'lower_date' : parameters['lower_date'],
+        'upper_date' : parameters['upper_date'],
         })
     return context
 
