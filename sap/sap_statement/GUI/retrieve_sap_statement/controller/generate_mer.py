@@ -128,6 +128,7 @@ def clean_data_pipeline(file_path: str, customer_name : str, parameters : dict) 
             ],
         'lower_date' : parameters['lower_date'],
         'upper_date' : parameters['upper_date'],
+        'patient_pays': parameters['patient_pays']
         })
     return context
 
@@ -164,8 +165,11 @@ def filter_by_date(context : dict) -> dict:
     return context
 
 def filter_by_patient_pays(context : dict) -> dict:
-    # context['df'] = context['df'][(context['df']['Patient Pays'] != 0)]
-    context['df'] = context['df'][(context['df']['Patient Pays'] == 0)]
+    if context['patient_pays'] == 1: # Covered
+        context['df'] = context['df'][(context['df']['Patient Pays'] == 0)]
+    elif context['patient_pays'] == 2: # Not Covered
+        context['df'] = context['df'][(context['df']['Patient Pays'] != 0)]
+    
     return context
 
 def to_str(context : dict) -> dict:

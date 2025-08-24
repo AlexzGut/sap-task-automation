@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QGridLayout, QLabel, QCheckBox, QPushButton, QCalendarWidget, QDialog
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QGridLayout, QFormLayout, QLabel, QComboBox, QCheckBox, QPushButton, QCalendarWidget, QDialog
 from PyQt6.QtCore import QDate, Qt
 
 
@@ -9,15 +9,26 @@ class AdvanceParametersSection(QWidget):
         # labels
         lb_lower_date = QLabel('From')
         lb_upper_date = QLabel('To')
+        lb_patient_pays = QLabel('Medication Coverage: ')
+        lb_patient_pays.setAlignment(Qt.AlignmentFlag.AlignRight)
 
         # Check Boxes
         self.cb_filters = QCheckBox('Advanced Filters')
 
+        # Buttons
         # Filter Dates
         self.btn_lower_date = QPushButton(QDate.currentDate().toString('MMMM d, yyyy'))
         self.btn_upper_date = QPushButton(QDate.currentDate().toString('MMMM d, yyyy'))
         self.lower_date = QDate(2000,1,1)
         self.upper_date = QDate().currentDate()
+
+        # Dropdowns
+        self.dd_patient_pays = QComboBox()
+        dropdown_items = ['Not covered', 'Covered', 'Both']
+        dropdown_items.sort()
+        self.dd_patient_pays.addItems(dropdown_items)
+        self.dd_patient_pays.setInsertPolicy(QComboBox.InsertPolicy.InsertAlphabetically)
+        self.dd_patient_pays.setEditable(False)
 
         # === QCheckBox Signals ===
         self.cb_filters.stateChanged.connect(self.display_filters)
@@ -28,7 +39,7 @@ class AdvanceParametersSection(QWidget):
 
         # === Layouts ===
         main_layout = QVBoxLayout()
-        main_layout.setContentsMargins(0,0,0,0)
+        main_layout.setContentsMargins(0,20,0,20)
 
         g_filters_layout = QGridLayout()
         g_filters_layout.addWidget(lb_lower_date, 0, 0)
@@ -36,11 +47,14 @@ class AdvanceParametersSection(QWidget):
         g_filters_layout.addWidget(self.btn_lower_date, 1, 0)
         g_filters_layout.addWidget(self.btn_upper_date, 1, 1)
 
+        g_filters_layout.addWidget(lb_patient_pays, 2, 0)
+        g_filters_layout.addWidget(self.dd_patient_pays, 2, 1)
+
         main_layout.addWidget(self.cb_filters)
         main_layout.addLayout(g_filters_layout)
 
         # Hiding widgets in filters layout
-        self.h_filters_widgets = [lb_lower_date, lb_upper_date, self.btn_lower_date, self.btn_upper_date]
+        self.h_filters_widgets = [lb_lower_date, lb_upper_date, lb_patient_pays, self.btn_lower_date, self.btn_upper_date, self.dd_patient_pays]
         for widget in self.h_filters_widgets:
             widget.hide()
 
@@ -76,6 +90,7 @@ class AdvanceParametersSection(QWidget):
         return {
             'lower_date': self.lower_date.toPyDate(),
             'upper_date': self.upper_date.toPyDate(),
+            'patient_pays': self.dd_patient_pays.currentIndex(),
         }
 
 
